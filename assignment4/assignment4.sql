@@ -18,6 +18,7 @@ You might have an organization with a depth of three levels. For example: there 
 to the CEO, and two managers that report to each of the two vice presidents. An assistant might also report directly to the CEO. 
 Your table should be designed so that the reporting hierarchy could go to any practical depth.
 
+
 */
 
 -- ########################
