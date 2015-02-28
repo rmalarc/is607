@@ -11,7 +11,7 @@ This database helps RVC Gym nmanage their fitness class registration
 ##Artifacts:
 * **Details**: [Power Point](https://docs.google.com/presentation/d/1w5z3h6JoZAnH4UDiTxs2b3gL8mPV5IMibWcjKNCiSK0/edit?usp=sharing)
 
-* **Wireframe Prototype**: [Prototype - http://natame.com/cuny/is607/project1/](wireframe/index.html). Snapshots are also available in Details powerpoint.
+* **Wireframe Prototype**: [Prototype - http://natame.com/cuny/is607/project1/](http://natame.com/cuny/is607/project1/). Snapshots are available in Details powerpoint, source code is in wireframe folder.
 
 * **ERD**: [ERD - RVC Gym.pdf](ERD - RVC Gym.pdf)
 
