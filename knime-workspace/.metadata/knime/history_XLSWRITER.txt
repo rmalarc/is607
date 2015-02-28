@@ -1,1 +1,2 @@
+knime://knime.workflow/sandwich_forecast_data.xls
 knime://knime.workflow/sandwich_forecast.xls

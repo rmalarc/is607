@@ -6,9 +6,9 @@
 <entry key="memory_policy" type="xstring" value="CacheSmallInMemory"/>
 </config>
 <config key="model">
-<entry key="expression" type="xstring" value="min_in_args(ceil($Median(demand.ham) (#1)$),$demand.ham$)*$ham+First*(price)$-ceil($Median(demand.ham) (#1)$)*$ham+First*(cost)$"/>
-<entry key="replaced_column" type="xstring" value="ham_profit_median_month"/>
 <entry key="append_column" type="xboolean" value="false"/>
+<entry key="replaced_column" type="xstring" value="ham_profit_median_month"/>
+<entry key="expression" type="xstring" value="min_in_args(ceil($demand.ham (Median)$),$demand.ham$)*$ham+First*(price)$-ceil($demand.ham (Median)$)*$ham+First*(cost)$"/>
 <entry key="convert_to_int" type="xboolean" value="false"/>
 </config>
 <config key="nodeAnnotation">
@@ -44,6 +44,6 @@
 </config>
 <config key="filestores">
 <entry key="file_store_location" type="xstring" isnull="true" value=""/>
-<entry key="file_store_id" type="xstring" value="7b0a5939-a909-4d4a-bb71-394dfa016734"/>
+<entry key="file_store_id" type="xstring" value="c567bcc1-f1ad-4047-ba7e-e0dbb5438d95"/>
 </config>
 </config>

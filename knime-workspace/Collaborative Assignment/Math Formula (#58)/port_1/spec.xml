@@ -3,7 +3,7 @@
 <entry key="spec_name" type="xstring" value="default"/>
 <entry key="number_columns" type="xint" value="37"/>
 <config key="column_spec_0">
-<entry key="column_name" type="xstring" value="Median(demand.turkey)"/>
+<entry key="column_name" type="xstring" value="demand.turkey (Median)"/>
 <config key="element_names">
 <entry key="array-size" type="xint" value="0"/>
 </config>
@@ -27,7 +27,7 @@
 <config key="column_properties"/>
 </config>
 <config key="column_spec_1">
-<entry key="column_name" type="xstring" value="Median(demand.veggie)"/>
+<entry key="column_name" type="xstring" value="demand.veggie (Median)"/>
 <config key="element_names">
 <entry key="array-size" type="xint" value="0"/>
 </config>
@@ -51,7 +51,7 @@
 <config key="column_properties"/>
 </config>
 <config key="column_spec_2">
-<entry key="column_name" type="xstring" value="Median(demand.ham)"/>
+<entry key="column_name" type="xstring" value="demand.ham (Median)"/>
 <config key="element_names">
 <entry key="array-size" type="xint" value="0"/>
 </config>
@@ -147,7 +147,7 @@
 <config key="column_properties"/>
 </config>
 <config key="column_spec_6">
-<entry key="column_name" type="xstring" value="Median(demand.ham) (#1)"/>
+<entry key="column_name" type="xstring" value="Median(demand.ham)"/>
 <config key="element_names">
 <entry key="array-size" type="xint" value="0"/>
 </config>
@@ -171,7 +171,7 @@
 <config key="column_properties"/>
 </config>
 <config key="column_spec_7">
-<entry key="column_name" type="xstring" value="Median(demand.turkey) (#1)"/>
+<entry key="column_name" type="xstring" value="Median(demand.turkey)"/>
 <config key="element_names">
 <entry key="array-size" type="xint" value="0"/>
 </config>
@@ -195,7 +195,7 @@
 <config key="column_properties"/>
 </config>
 <config key="column_spec_8">
-<entry key="column_name" type="xstring" value="Median(demand.veggie) (#1)"/>
+<entry key="column_name" type="xstring" value="Median(demand.veggie)"/>
 <config key="element_names">
 <entry key="array-size" type="xint" value="0"/>
 </config>
@@ -881,13 +881,13 @@
 <config key="lower_bound">
 <entry key="datacell" type="xstring" value="org.knime.core.data.def.DoubleCell"/>
 <config key="org.knime.core.data.def.DoubleCell">
-<entry key="DoubleCell" type="xdouble" value="-27.5"/>
+<entry key="DoubleCell" type="xdouble" value="-17.0"/>
 </config>
 </config>
 <config key="upper_bound">
 <entry key="datacell" type="xstring" value="org.knime.core.data.def.DoubleCell"/>
 <config key="org.knime.core.data.def.DoubleCell">
-<entry key="DoubleCell" type="xdouble" value="66.0"/>
+<entry key="DoubleCell" type="xdouble" value="48.0"/>
 </config>
 </config>
 </config>
@@ -905,13 +905,13 @@
 <config key="lower_bound">
 <entry key="datacell" type="xstring" value="org.knime.core.data.def.DoubleCell"/>
 <config key="org.knime.core.data.def.DoubleCell">
-<entry key="DoubleCell" type="xdouble" value="-6.5"/>
+<entry key="DoubleCell" type="xdouble" value="-3.5"/>
 </config>
 </config>
 <config key="upper_bound">
 <entry key="datacell" type="xstring" value="org.knime.core.data.def.DoubleCell"/>
 <config key="org.knime.core.data.def.DoubleCell">
-<entry key="DoubleCell" type="xdouble" value="70.0"/>
+<entry key="DoubleCell" type="xdouble" value="57.5"/>
 </config>
 </config>
 </config>

@@ -20,9 +20,9 @@
 <entry key="suffix" type="xstring" value="(*)"/>
 <config key="leftIncludeCols">
 <entry key="array-size" type="xint" value="3"/>
-<entry key="0" type="xstring" value="Median(demand.turkey)"/>
-<entry key="1" type="xstring" value="Median(demand.veggie)"/>
-<entry key="2" type="xstring" value="Median(demand.ham)"/>
+<entry key="0" type="xstring" value="demand.turkey (Median)"/>
+<entry key="1" type="xstring" value="demand.veggie (Median)"/>
+<entry key="2" type="xstring" value="demand.ham (Median)"/>
 </config>
 <config key="rightIncludeCols">
 <entry key="array-size" type="xint" value="33"/>
@@ -107,6 +107,6 @@
 </config>
 <config key="filestores">
 <entry key="file_store_location" type="xstring" isnull="true" value=""/>
-<entry key="file_store_id" type="xstring" value="c85747b8-70c2-402a-9faa-4361719e4d3d"/>
+<entry key="file_store_id" type="xstring" value="d61f7c66-a33b-4c13-96d7-99547ca77c3f"/>
 </config>
 </config>

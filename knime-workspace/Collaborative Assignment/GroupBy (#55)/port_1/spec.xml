@@ -54,7 +54,7 @@
 <config key="column_properties"/>
 </config>
 <config key="column_spec_1">
-<entry key="column_name" type="xstring" value="Median(demand.turkey)"/>
+<entry key="column_name" type="xstring" value="demand.turkey (Median)"/>
 <config key="element_names">
 <entry key="array-size" type="xint" value="0"/>
 </config>
@@ -78,7 +78,7 @@
 <config key="column_properties"/>
 </config>
 <config key="column_spec_2">
-<entry key="column_name" type="xstring" value="Median(demand.veggie)"/>
+<entry key="column_name" type="xstring" value="demand.veggie (Median)"/>
 <config key="element_names">
 <entry key="array-size" type="xint" value="0"/>
 </config>
@@ -102,7 +102,7 @@
 <config key="column_properties"/>
 </config>
 <config key="column_spec_3">
-<entry key="column_name" type="xstring" value="Median(demand.ham)"/>
+<entry key="column_name" type="xstring" value="demand.ham (Median)"/>
 <config key="element_names">
 <entry key="array-size" type="xint" value="0"/>
 </config>
@@ -126,7 +126,7 @@
 <config key="column_properties"/>
 </config>
 <config key="column_spec_4">
-<entry key="column_name" type="xstring" value="Mean(demand.ham)"/>
+<entry key="column_name" type="xstring" value="demand.ham (Mean)"/>
 <config key="element_names">
 <entry key="array-size" type="xint" value="0"/>
 </config>
@@ -150,7 +150,7 @@
 <config key="column_properties"/>
 </config>
 <config key="column_spec_5">
-<entry key="column_name" type="xstring" value="Mean(demand.turkey)"/>
+<entry key="column_name" type="xstring" value="demand.turkey (Mean)"/>
 <config key="element_names">
 <entry key="array-size" type="xint" value="0"/>
 </config>
@@ -174,7 +174,7 @@
 <config key="column_properties"/>
 </config>
 <config key="column_spec_6">
-<entry key="column_name" type="xstring" value="Mean(demand.veggie)"/>
+<entry key="column_name" type="xstring" value="demand.veggie (Mean)"/>
 <config key="element_names">
 <entry key="array-size" type="xint" value="0"/>
 </config>
@@ -198,7 +198,7 @@
 <config key="column_properties"/>
 </config>
 <config key="column_spec_7">
-<entry key="column_name" type="xstring" value="Standard deviation(demand.ham)"/>
+<entry key="column_name" type="xstring" value="demand.ham (Standard deviation)"/>
 <config key="element_names">
 <entry key="array-size" type="xint" value="0"/>
 </config>
@@ -222,7 +222,7 @@
 <config key="column_properties"/>
 </config>
 <config key="column_spec_8">
-<entry key="column_name" type="xstring" value="Standard deviation(demand.turkey)"/>
+<entry key="column_name" type="xstring" value="demand.turkey (Standard deviation)"/>
 <config key="element_names">
 <entry key="array-size" type="xint" value="0"/>
 </config>
@@ -246,7 +246,7 @@
 <config key="column_properties"/>
 </config>
 <config key="column_spec_9">
-<entry key="column_name" type="xstring" value="Standard deviation(demand.veggie)"/>
+<entry key="column_name" type="xstring" value="demand.veggie (Standard deviation)"/>
 <config key="element_names">
 <entry key="array-size" type="xint" value="0"/>
 </config>

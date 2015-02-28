@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://www.knime.org/2008/09/XMLConfig" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.knime.org/2008/09/XMLConfig http://www.knime.org/XMLConfig_2008_09.xsd" key="settings.xml">
+<entry key="node_file" type="xstring" value="settings.xml"/>
+<config key="flow_stack"/>
+<config key="internal_node_subsettings">
+<entry key="memory_policy" type="xstring" value="CacheSmallInMemory"/>
+</config>
+<config key="model">
+<entry key="xCellOffset" type="xint" value="0"/>
+<entry key="yCellOffset" type="xint" value="0"/>
+<entry key="writeColHdr" type="xboolean" value="true"/>
+<entry key="writeRowHdr" type="xboolean" value="false"/>
+<entry key="filename" type="xstring" value="knime://knime.workflow/sandwich_forecast_data.xls"/>
+<entry key="sheetname" type="xstring" value="default"/>
+<entry key="missingPattern" type="xstring" value=""/>
+<entry key="overwrite_ok" type="xboolean" value="true"/>
+<entry key="open_file" type="xboolean" value="false"/>
+<entry key="file_must_exist" type="xboolean" value="false"/>
+<entry key="do_not_overwrite_sheet" type="xboolean" value="false"/>
+<entry key="landscape" type="xboolean" value="false"/>
+<entry key="autosize" type="xboolean" value="false"/>
+<entry key="paper_size" type="xshort" value="1"/>
+<config key="xlswriter2">
+<entry key="filter-type" type="xstring" value="STANDARD"/>
+<config key="included_names">
+<entry key="array-size" type="xint" value="38"/>
+<entry key="0" type="xstring" value="Median(demand.turkey)"/>
+<entry key="1" type="xstring" value="Median(demand.veggie)"/>
+<entry key="2" type="xstring" value="Median(demand.ham)"/>
+<entry key="3" type="xstring" value="Mean(demand.turkey)"/>
+<entry key="4" type="xstring" value="Mean(demand.veggie)"/>
+<entry key="5" type="xstring" value="Mean(demand.ham)"/>
+<entry key="6" type="xstring" value="Median(demand.ham) (#1)"/>
+<entry key="7" type="xstring" value="Median(demand.turkey) (#1)"/>
+<entry key="8" type="xstring" value="Median(demand.veggie) (#1)"/>
+<entry key="9" type="xstring" value="date"/>
+<entry key="10" type="xstring" value="demand.ham"/>
+<entry key="11" type="xstring" value="demand.turkey"/>
+<entry key="12" type="xstring" value="demand.veggie"/>
+<entry key="13" type="xstring" value="available.ham"/>
+<entry key="14" type="xstring" value="available.turkey"/>
+<entry key="15" type="xstring" value="available.veggie"/>
+<entry key="16" type="xstring" value="month_num"/>
+<entry key="17" type="xstring" value="day_of_week"/>
+<entry key="18" type="xstring" value="day_of_week_num"/>
+<entry key="19" type="xstring" value="ham+First*(price)"/>
+<entry key="20" type="xstring" value="ham+First*(cost)"/>
+<entry key="21" type="xstring" value="turkey+First*(price)"/>
+<entry key="22" type="xstring" value="turkey+First*(cost)"/>
+<entry key="23" type="xstring" value="veggie+First*(price)"/>
+<entry key="24" type="xstring" value="veggie+First*(cost)"/>
+<entry key="25" type="xstring" value="ham_margin"/>
+<entry key="26" type="xstring" value="turkey_margin"/>
+<entry key="27" type="xstring" value="veggie_margin"/>
+<entry key="28" type="xstring" value="ham_missed_profit"/>
+<entry key="29" type="xstring" value="ham_profit"/>
+<entry key="30" type="xstring" value="turkey_profit"/>
+<entry key="31" type="xstring" value="veggie_profit"/>
+<entry key="32" type="xstring" value="ham_profit_median"/>
+<entry key="33" type="xstring" value="turkey_profit_median"/>
+<entry key="34" type="xstring" value="veggie_profit_median"/>
+<entry key="35" type="xstring" value="ham_profit_median_month"/>
+<entry key="36" type="xstring" value="turkey_profit_median_month"/>
+<entry key="37" type="xstring" value="veggie_profit_median_month"/>
+</config>
+<config key="excluded_names">
+<entry key="array-size" type="xint" value="0"/>
+</config>
+<entry key="enforce_option" type="xstring" value="EnforceExclusion"/>
+<config key="name_pattern">
+<entry key="pattern" type="xstring" value=""/>
+<entry key="type" type="xstring" value="Wildcard"/>
+<entry key="caseSensitive" type="xboolean" value="true"/>
+</config>
+<config key="datatype">
+<config key="typelist">
+<entry key="org.knime.core.data.BooleanValue" type="xboolean" value="false"/>
+<entry key="org.knime.core.data.date.DateAndTimeValue" type="xboolean" value="false"/>
+<entry key="org.knime.core.data.DoubleValue" type="xboolean" value="false"/>
+<entry key="org.knime.core.data.IntValue" type="xboolean" value="false"/>
+<entry key="org.knime.core.data.LongValue" type="xboolean" value="false"/>
+<entry key="org.knime.core.data.StringValue" type="xboolean" value="false"/>
+</config>
+</config>
+</config>
+</config>
+<entry key="customDescription" type="xstring" isnull="true" value=""/>
+<entry key="state" type="xstring" value="CONFIGURED"/>
+<config key="nodecontainer_message">
+<entry key="type" type="xstring" value="WARNING"/>
+<entry key="message" type="xstring" value="Output file '/Users/malarcon/Google Drive/CUNY/IS607/submissions/knime-workspace/Collaborative Assignment/sandwich_forecast_data.xls' exists and will be overwritten"/>
+</config>
+<entry key="factory" type="xstring" value="org.knime.ext.poi.node.write2.XLSWriter2NodeFactory"/>
+<entry key="node-name" type="xstring" value="XLS Writer"/>
+<entry key="node-bundle-name" type="xstring" value="KNIME POI Plug-in"/>
+<entry key="node-bundle-symbolic-name" type="xstring" value="org.knime.ext.poi"/>
+<entry key="node-bundle-vendor" type="xstring" value="KNIME GmbH, Konstanz, Germany"/>
+<entry key="node-bundle-version" type="xstring" value="2.11.1.0045686"/>
+<config key="factory_settings"/>
+<entry key="name" type="xstring" value="XLS Writer"/>
+<entry key="hasContent" type="xboolean" value="false"/>
+<entry key="isInactive" type="xboolean" value="false"/>
+<config key="ports"/>
+<config key="filestores">
+<entry key="file_store_location" type="xstring" isnull="true" value=""/>
+<entry key="file_store_id" type="xstring" isnull="true" value=""/>
+</config>
+</config>

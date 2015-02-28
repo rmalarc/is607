@@ -6,9 +6,9 @@
 <entry key="memory_policy" type="xstring" value="CacheSmallInMemory"/>
 </config>
 <config key="model">
-<entry key="expression" type="xstring" value="min_in_args(ceil($Median(demand.turkey) (#1)$),$demand.turkey$)*$turkey+First*(price)$-ceil($Median(demand.turkey) (#1)$)*$turkey+First*(cost)$"/>
-<entry key="replaced_column" type="xstring" value="turkey_profit_median_month"/>
 <entry key="append_column" type="xboolean" value="false"/>
+<entry key="replaced_column" type="xstring" value="turkey_profit_median_month"/>
+<entry key="expression" type="xstring" value="min_in_args(ceil($demand.turkey (Median)$),$demand.turkey$)*$turkey+First*(price)$-ceil($demand.turkey (Median)$)*$turkey+First*(cost)$"/>
 <entry key="convert_to_int" type="xboolean" value="false"/>
 </config>
 <config key="nodeAnnotation">
@@ -44,6 +44,6 @@
 </config>
 <config key="filestores">
 <entry key="file_store_location" type="xstring" isnull="true" value=""/>
-<entry key="file_store_id" type="xstring" value="89045869-92ca-4ca5-a6f3-d61165ac3b8c"/>
+<entry key="file_store_id" type="xstring" value="95bd748f-575c-453b-ad75-0ac890cb129b"/>
 </config>
 </config>

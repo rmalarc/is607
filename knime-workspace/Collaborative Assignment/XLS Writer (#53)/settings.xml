@@ -56,7 +56,11 @@
 </config>
 </config>
 <entry key="customDescription" type="xstring" isnull="true" value=""/>
-<entry key="state" type="xstring" value="EXECUTED"/>
+<entry key="state" type="xstring" value="CONFIGURED"/>
+<config key="nodecontainer_message">
+<entry key="type" type="xstring" value="WARNING"/>
+<entry key="message" type="xstring" value="Output file '/Users/malarcon/Google Drive/CUNY/IS607/submissions/knime-workspace/Collaborative Assignment/sandwich_forecast.xls' exists and will be overwritten"/>
+</config>
 <entry key="factory" type="xstring" value="org.knime.ext.poi.node.write2.XLSWriter2NodeFactory"/>
 <entry key="node-name" type="xstring" value="XLS Writer"/>
 <entry key="node-bundle-name" type="xstring" value="KNIME POI Plug-in"/>
@@ -65,11 +69,11 @@
 <entry key="node-bundle-version" type="xstring" value="2.11.1.0045686"/>
 <config key="factory_settings"/>
 <entry key="name" type="xstring" value="XLS Writer"/>
-<entry key="hasContent" type="xboolean" value="true"/>
+<entry key="hasContent" type="xboolean" value="false"/>
 <entry key="isInactive" type="xboolean" value="false"/>
 <config key="ports"/>
 <config key="filestores">
 <entry key="file_store_location" type="xstring" isnull="true" value=""/>
-<entry key="file_store_id" type="xstring" value="09498583-4bdc-4cd2-81fe-d92ae1d9c9b9"/>
+<entry key="file_store_id" type="xstring" isnull="true" value=""/>
 </config>
 </config>
