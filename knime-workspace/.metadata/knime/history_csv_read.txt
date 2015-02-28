@@ -1,0 +1,2 @@
+knime://knime.workflow/details.csv
+knime://knime.workflow/sales.csv

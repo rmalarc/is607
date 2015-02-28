@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://www.knime.org/2008/09/XMLConfig" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.knime.org/2008/09/XMLConfig http://www.knime.org/XMLConfig_2008_09.xsd" key="conditionalBoxPlotInternals">
+<entry key="nrOfCols" type="xint" value="5"/>
+<config key="col0">
+<entry key="column_name" type="xstring" value="Friday"/>
+<config key="element_names">
+<entry key="array-size" type="xint" value="0"/>
+</config>
+<config key="column_type">
+<entry key="cell_class" type="xstring" value="org.knime.core.data.def.DoubleCell"/>
+</config>
+<config key="column_domain">
+<config key="lower_bound">
+<entry key="datacell" type="xstring" value="org.knime.core.data.def.DoubleCell"/>
+<config key="org.knime.core.data.def.DoubleCell">
+<entry key="DoubleCell" type="xdouble" value="6.0"/>
+</config>
+</config>
+<config key="upper_bound">
+<entry key="datacell" type="xstring" value="org.knime.core.data.def.DoubleCell"/>
+<config key="org.knime.core.data.def.DoubleCell">
+<entry key="DoubleCell" type="xdouble" value="54.0"/>
+</config>
+</config>
+</config>
+<config key="column_properties"/>
+</config>
+<config key="col1">
+<entry key="column_name" type="xstring" value="Monday"/>
+<config key="element_names">
+<entry key="array-size" type="xint" value="0"/>
+</config>
+<config key="column_type">
+<entry key="cell_class" type="xstring" value="org.knime.core.data.def.DoubleCell"/>
+</config>
+<config key="column_domain">
+<config key="lower_bound">
+<entry key="datacell" type="xstring" value="org.knime.core.data.def.DoubleCell"/>
+<config key="org.knime.core.data.def.DoubleCell">
+<entry key="DoubleCell" type="xdouble" value="2.0"/>
+</config>
+</config>
+<config key="upper_bound">
+<entry key="datacell" type="xstring" value="org.knime.core.data.def.DoubleCell"/>
+<config key="org.knime.core.data.def.DoubleCell">
+<entry key="DoubleCell" type="xdouble" value="54.0"/>
+</config>
+</config>
+</config>
+<config key="column_properties"/>
+</config>
+<config key="col2">
+<entry key="column_name" type="xstring" value="Thursday"/>
+<config key="element_names">
+<entry key="array-size" type="xint" value="0"/>
+</config>
+<config key="column_type">
+<entry key="cell_class" type="xstring" value="org.knime.core.data.def.DoubleCell"/>
+</config>
+<config key="column_domain">
+<config key="lower_bound">
+<entry key="datacell" type="xstring" value="org.knime.core.data.def.DoubleCell"/>
+<config key="org.knime.core.data.def.DoubleCell">
+<entry key="DoubleCell" type="xdouble" value="12.5"/>
+</config>
+</config>
+<config key="upper_bound">
+<entry key="datacell" type="xstring" value="org.knime.core.data.def.DoubleCell"/>
+<config key="org.knime.core.data.def.DoubleCell">
+<entry key="DoubleCell" type="xdouble" value="54.0"/>
+</config>
+</config>
+</config>
+<config key="column_properties"/>
+</config>
+<config key="col3">
+<entry key="column_name" type="xstring" value="Tuesday"/>
+<config key="element_names">
+<entry key="array-size" type="xint" value="0"/>
+</config>
+<config key="column_type">
+<entry key="cell_class" type="xstring" value="org.knime.core.data.def.DoubleCell"/>
+</config>
+<config key="column_domain">
+<config key="lower_bound">
+<entry key="datacell" type="xstring" value="org.knime.core.data.def.DoubleCell"/>
+<config key="org.knime.core.data.def.DoubleCell">
+<entry key="DoubleCell" type="xdouble" value="-13.5"/>
+</config>
+</config>
+<config key="upper_bound">
+<entry key="datacell" type="xstring" value="org.knime.core.data.def.DoubleCell"/>
+<config key="org.knime.core.data.def.DoubleCell">
+<entry key="DoubleCell" type="xdouble" value="54.0"/>
+</config>
+</config>
+</config>
+<config key="column_properties"/>
+</config>
+<config key="col4">
+<entry key="column_name" type="xstring" value="Wednesday"/>
+<config key="element_names">
+<entry key="array-size" type="xint" value="0"/>
+</config>
+<config key="column_type">
+<entry key="cell_class" type="xstring" value="org.knime.core.data.def.DoubleCell"/>
+</config>
+<config key="column_domain">
+<config key="lower_bound">
+<entry key="datacell" type="xstring" value="org.knime.core.data.def.DoubleCell"/>
+<config key="org.knime.core.data.def.DoubleCell">
+<entry key="DoubleCell" type="xdouble" value="-24.0"/>
+</config>
+</config>
+<config key="upper_bound">
+<entry key="datacell" type="xstring" value="org.knime.core.data.def.DoubleCell"/>
+<config key="org.knime.core.data.def.DoubleCell">
+<entry key="DoubleCell" type="xdouble" value="54.0"/>
+</config>
+</config>
+</config>
+<config key="column_properties"/>
+</config>
+<config key="numColSpec">
+<entry key="column_name" type="xstring" value="ham_profit"/>
+<config key="element_names">
+<entry key="array-size" type="xint" value="0"/>
+</config>
+<config key="column_type">
+<entry key="cell_class" type="xstring" value="org.knime.core.data.def.DoubleCell"/>
+</config>
+<config key="column_domain">
+<config key="lower_bound">
+<entry key="datacell" type="xstring" value="org.knime.core.data.def.DoubleCell"/>
+<config key="org.knime.core.data.def.DoubleCell">
+<entry key="DoubleCell" type="xdouble" value="-24.0"/>
+</config>
+</config>
+<config key="upper_bound">
+<entry key="datacell" type="xstring" value="org.knime.core.data.def.DoubleCell"/>
+<config key="org.knime.core.data.def.DoubleCell">
+<entry key="DoubleCell" type="xdouble" value="54.0"/>
+</config>
+</config>
+</config>
+<config key="column_properties"/>
+</config>
+<config key="statsFriday">
+<entry key="array-size" type="xint" value="7"/>
+<entry key="0" type="xdouble" value="6.0"/>
+<entry key="1" type="xdouble" value="6.0"/>
+<entry key="2" type="xdouble" value="25.5"/>
+<entry key="3" type="xdouble" value="42.0"/>
+<entry key="4" type="xdouble" value="45.0"/>
+<entry key="5" type="xdouble" value="54.0"/>
+<entry key="6" type="xdouble" value="54.0"/>
+</config>
+<config key="mildFriday">
+<entry key="array-size" type="xint" value="0"/>
+</config>
+<config key="extremeFriday">
+<entry key="array-size" type="xint" value="0"/>
+</config>
+<config key="statsMonday">
+<entry key="array-size" type="xint" value="7"/>
+<entry key="0" type="xdouble" value="2.0"/>
+<entry key="1" type="xdouble" value="25.5"/>
+<entry key="2" type="xdouble" value="35.5"/>
+<entry key="3" type="xdouble" value="42.0"/>
+<entry key="4" type="xdouble" value="45.0"/>
+<entry key="5" type="xdouble" value="54.0"/>
+<entry key="6" type="xdouble" value="54.0"/>
+</config>
+<config key="mildKeysMonday0">
+<entry key="array-size" type="xint" value="1"/>
+<entry key="0" type="xstring" value="Row50_Row0"/>
+</config>
+<config key="mildKeysMonday1">
+<entry key="array-size" type="xint" value="1"/>
+<entry key="0" type="xstring" value="Row25_Row0"/>
+</config>
+<config key="mildMonday">
+<entry key="array-size" type="xint" value="2"/>
+<entry key="0" type="xdouble" value="8.5"/>
+<entry key="1" type="xdouble" value="16.0"/>
+</config>
+<config key="extremeKeysMonday0">
+<entry key="array-size" type="xint" value="1"/>
+<entry key="0" type="xstring" value="Row55_Row0"/>
+</config>
+<config key="extremeMonday">
+<entry key="array-size" type="xint" value="1"/>
+<entry key="0" type="xdouble" value="2.0"/>
+</config>
+<config key="statsThursday">
+<entry key="array-size" type="xint" value="7"/>
+<entry key="0" type="xdouble" value="12.5"/>
+<entry key="1" type="xdouble" value="19.0"/>
+<entry key="2" type="xdouble" value="34.5"/>
+<entry key="3" type="xdouble" value="42.0"/>
+<entry key="4" type="xdouble" value="45.0"/>
+<entry key="5" type="xdouble" value="54.0"/>
+<entry key="6" type="xdouble" value="54.0"/>
+</config>
+<config key="mildKeysThursday0">
+<entry key="array-size" type="xint" value="1"/>
+<entry key="0" type="xstring" value="Row123_Row0"/>
+</config>
+<config key="mildThursday">
+<entry key="array-size" type="xint" value="1"/>
+<entry key="0" type="xdouble" value="12.5"/>
+</config>
+<config key="extremeThursday">
+<entry key="array-size" type="xint" value="0"/>
+</config>
+<config key="statsTuesday">
+<entry key="array-size" type="xint" value="7"/>
+<entry key="0" type="xdouble" value="-13.5"/>
+<entry key="1" type="xdouble" value="21.5"/>
+<entry key="2" type="xdouble" value="34.5"/>
+<entry key="3" type="xdouble" value="42.0"/>
+<entry key="4" type="xdouble" value="45.0"/>
+<entry key="5" type="xdouble" value="54.0"/>
+<entry key="6" type="xdouble" value="54.0"/>
+</config>
+<config key="mildKeysTuesday0">
+<entry key="array-size" type="xint" value="1"/>
+<entry key="0" type="xstring" value="Row6_Row0"/>
+</config>
+<config key="mildTuesday">
+<entry key="array-size" type="xint" value="1"/>
+<entry key="0" type="xdouble" value="16.0"/>
+</config>
+<config key="extremeKeysTuesday0">
+<entry key="array-size" type="xint" value="1"/>
+<entry key="0" type="xstring" value="Row126_Row0"/>
+</config>
+<config key="extremeTuesday">
+<entry key="array-size" type="xint" value="1"/>
+<entry key="0" type="xdouble" value="-13.5"/>
+</config>
+<config key="statsWednesday">
+<entry key="array-size" type="xint" value="7"/>
+<entry key="0" type="xdouble" value="-24.0"/>
+<entry key="1" type="xdouble" value="9.5"/>
+<entry key="2" type="xdouble" value="22.5"/>
+<entry key="3" type="xdouble" value="42.0"/>
+<entry key="4" type="xdouble" value="45.0"/>
+<entry key="5" type="xdouble" value="54.0"/>
+<entry key="6" type="xdouble" value="54.0"/>
+</config>
+<config key="mildKeysWednesday0">
+<entry key="array-size" type="xint" value="1"/>
+<entry key="0" type="xstring" value="Row62_Row0"/>
+</config>
+<config key="mildWednesday">
+<entry key="array-size" type="xint" value="1"/>
+<entry key="0" type="xdouble" value="-24.0"/>
+</config>
+<config key="extremeWednesday">
+<entry key="array-size" type="xint" value="0"/>
+</config>
+</config>

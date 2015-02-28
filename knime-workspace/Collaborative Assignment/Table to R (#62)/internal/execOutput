@@ -1,0 +1,42 @@
+#############################################
+#
+# Content of .Rout file: 
+#
+#############################################
+ 
+
+R version 3.1.2 (2014-10-31) -- "Pumpkin Helmet"
+Copyright (C) 2014 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin10.8.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> setwd("/var/folders/jl/tz5928md4mj9tmgk2k553cjh0000gq/T/knime_Collaborative A40414");
+> load("/var/folders/jl/tz5928md4mj9tmgk2k553cjh0000gq/T/knime_Collaborative A40414/R-workspace1167639619911102191.RData");
+> rframe <- data.frame(
++ 	turkey_mean=knime.in$"Mean(demand.turkey)"
++ 	,veggie_mean=knime.in$"Mean(demand.veggie)"
++ 	,ham_mean=knime.in$"Mean(demand.ham)"
++ 	,turkey_std=knime.in$"Standard deviation(demand.turkey)"
++ 	,veggie_std=knime.in$"Standard deviation(demand.veggie)"
++ 	,ham_std=knime.in$"Standard deviation(demand.ham)"
++ 	)
+> 
+> knime.loaded.libraries <- (.packages());
+> save.image("/var/folders/jl/tz5928md4mj9tmgk2k553cjh0000gq/T/knime_Collaborative A40414/R-workspace1167639619911102191.RData");
+> 
+> proc.time()
+   user  system elapsed 
+  0.156   0.027   0.179 
