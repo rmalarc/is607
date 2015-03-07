@@ -1,0 +1,29 @@
+---
+title: "IS607 - Tidying and Transforming Data"
+author: "Mauricio Alarcon"
+date: "March 7, 2015"
+output: ioslides_presentation
+---
+
+## Weeks 7/8 Assignment: Tidying and Transforming Data
+
+In a recent mythical poll in Scotland, voters were asked if they preferred Cullen skink over Partan bree. Here are the results of the poll, with results broken down by city and by age group.
+
+## Slide with Bullets
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+## Slide with R Code and Output
+
+```{r}
+summary(cars)
+```
+
+## Slide with Plot
+
+```{r, echo=FALSE}
+plot(cars)
+```
+
