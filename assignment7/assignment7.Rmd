@@ -9,6 +9,7 @@ output: ioslides_presentation
 
 In a recent mythical poll in Scotland, voters were asked if they preferred Cullen skink over Partan bree. Here are the results of the poll, with results broken down by city and by age group.
 
+<img src="https://raw.githubusercontent.com/rmalarc/is607/master/assignment7/data.png">
 ## Slide with Bullets
 
 - Bullet 1
