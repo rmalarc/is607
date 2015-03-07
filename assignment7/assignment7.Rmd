@@ -1,30 +1,116 @@
 ---
 title: "IS607 - Tidying and Transforming Data"
+subtitle: The Hunger Games - Cullen skink vs Partan bree!
 author: "Mauricio Alarcon"
 date: "March 7, 2015"
 output: ioslides_presentation
 ---
 
-## Weeks 7/8 Assignment: Tidying and Transforming Data
+## Week 7 Assignment: Tidying and Transforming Data
 
 In a recent mythical poll in Scotland, voters were asked if they preferred Cullen skink over Partan bree. Here are the results of the poll, with results broken down by city and by age group.
 
-<img src="https://raw.githubusercontent.com/rmalarc/is607/master/assignment7/data.png">
-## Slide with Bullets
 
-- Bullet 1
-- Bullet 2
-- Bullet 3
+<p align="center"><img align="center" width="500" height="123" src="https://raw.githubusercontent.com/rmalarc/is607/master/assignment7/data.png"></p>
 
-## Slide with R Code and Output
+## The data raises the following questions:
+
+- How many people in each city participated in the poll?
+- How many people in total prefer Cullen skink by city?
+- How many people in total prefer Partan bree by city?
+- Can we visualize the data?
+- What does this all mean?
+
+## Getting the data
 
 ```{r}
-summary(cars)
+data.messy <- data.frame(response=as.factor(c("Yes","No"))
+                         ,edinburgh.16_24=c(80100,35900)
+                         ,edinburgh.25_plus=c(143000,214800)
+                         ,glasgow.16_24=c(99400,43000)
+                         ,glasgow.25_plus=c(150400,207400)
+                         )
+(data.messy)
+```
+```{r, echo=FALSE,results = 'hide', warning=FALSE, message=FALSE}
+library(tidyr)
+library(dplyr)
+#library(plyr)
+```
+## Tidying the Data
+```{r}
+data.tidy <- data.messy %>% 
+  gather(variable, value, -response) %>%
+  separate(variable,into=c("city","age.group"),extra="merge")%>%
+  rename(preference=response)%>%
+  arrange(city,age.group,preference)
+
+levels(data.tidy$preference) <- list("Cullen skink"="Yes"
+                                     ,"Partan bree"="No")
+head(data.tidy)
 ```
 
-## Slide with Plot
+## How many people in each city participated in the poll?
+```{r}
+data.tidy %>%
+  group_by(city) %>%
+  summarise(
+    total_participants = sum(value)
+    )
+```
 
+## How many people in total prefer Cullen skink by city?
+```{r}
+data.tidy %>%
+  filter(preference=="Cullen skink") %>%
+  group_by(city) %>%
+  summarise(
+    prefer_cullen_skink_total = sum(value)
+    )
+```
+**Glasgow is of Cullen Skink capital!!**
+
+## How many people in total prefer Partan bree by city?
+```{r}
+data.tidy %>%
+  filter(preference=="Partan bree") %>%
+  group_by(city) %>%
+  summarise(
+    prefer_partan_bree_total = sum(value)
+    )
+```
+**It seems that Partan bree rules in both Glasgow and and Edinburgh**
+
+## Can we visualize the data?
 ```{r, echo=FALSE}
-plot(cars)
+library("ggplot2")
+qplot(city
+      , data=data.tidy[data.tidy$preference=="Cullen skink",]
+      ,main="Cullen skink by City and Age Group",
+      , geom="bar"
+      , fill=age.group
+      , weight = value)
 ```
 
+## Can we visualize the data?
+```{r, echo=FALSE}
+qplot(city
+      , data=data.tidy[data.tidy$preference=="Partan bree",]
+      ,main="Partan bree by City and Age Group",
+      , geom="bar"
+      , fill=age.group
+      , weight = value)
+
+```
+
+## What does this all mean?
+**For Partan Bree:**
+
+* People in Edinburgh and Glasgow equally like their Partan Bree
+* Those under 25 do not seem to like it as much as those over 25
+
+**For Cullen Skink:**
+
+* People in Glasgow like it more
+* In overall, it is not as popular as Partan Bree
+* Even though it is preferred mostly by those over 25, those under 25 seem to like it as well.
