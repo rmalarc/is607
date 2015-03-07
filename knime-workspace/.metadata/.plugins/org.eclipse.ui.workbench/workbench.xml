@@ -27,7 +27,7 @@
 </folder>
 </info>
 </editorArea>
-<editor activePart="true" focus="true" id="org.knime.workbench.editor.WorkflowEditor" name="workflow.knime" partName="2: Collaborative Assignment" title="2: Collaborative Assignment" tooltip="2: Collaborative Assignment" workbook="DefaultEditorWorkbook">
+<editor id="org.knime.workbench.editor.WorkflowEditor" name="workflow.knime" partName="0: Collaborative Assignment" title="0: Collaborative Assignment" tooltip="0: Collaborative Assignment" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" uri="knime://LOCAL/Collaborative%20Assignment/workflow.knime"/>
 </editor>
 <editor id="org.knime.workbench.editor.WorkflowEditor" name="workflow.knime" partName="0: Example Workflow" title="0: Example Workflow" tooltip="0: Example Workflow" workbook="DefaultEditorWorkbook">
@@ -68,7 +68,7 @@
 <viewState/>
 </view>
 </views>
-<perspectives activePart="org.knime.workbench.editor.WorkflowEditor" activePerspective="org.knime.workbench.ui.ModellerPerspective">
+<perspectives activePart="org.eclipse.ui.browser.editor" activePerspective="org.knime.workbench.ui.ModellerPerspective">
 <perspective editorAreaTrimState="2" editorAreaVisible="1" fixed="0" version="0.016">
 <descriptor class="org.knime.workbench.ui.perspective.ModellerPerspectiveFactory" id="org.knime.workbench.ui.ModellerPerspective" label="KNIME"/>
 <alwaysOnActionSet id="org.eclipse.ui.cheatsheets.actionSet"/>
@@ -194,46 +194,30 @@
 <fastViewBars/>
 <viewLayoutRec closeable="false" id="org.eclipse.birt.report.designer.ui.attributes.AttributeView" showTitle="true" standalone="true"/>
 <viewLayoutRec closeable="false" id="org.eclipse.gef.ui.palette_view"/>
-<layout>
-<mainWindow>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@6cf236f6">
-<folder activePageID="org.knime.workbench.explorer.view" appearance="2" expanded="2">
-<page content="org.knime.workbench.explorer.view" label="KNIME Explorer"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
-<part id="0"/>
+<layout>&#x0A;<mainWindow>&#x0A;<info folder="true" part="org.eclipse.ui.internal.ViewStack@6cf236f6">&#x0A;<folder activePageID="org.knime.workbench.explorer.view" appearance="2" expanded="2">&#x0A;<page content="org.knime.workbench.explorer.view" label="KNIME Explorer"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
 </presentation>
 </folder>
 </info>
-<info folder="true" part="stickyFolderRight" ratio="0.75" ratioLeft="954" ratioRight="318" relationship="2" relative="org.eclipse.ui.internal.ViewStack@6cf236f6">
-<folder appearance="2" expanded="2">
-<page content="org.eclipse.help.ui.HelpView" label="LabelNotFound"/>
+<info folder="true" part="stickyFolderRight" ratio="0.75" ratioLeft="954" ratioRight="318" relationship="2" relative="org.eclipse.ui.internal.ViewStack@6cf236f6">&#x0A;<folder appearance="2" expanded="2">&#x0A;<page content="org.eclipse.help.ui.HelpView" label="LabelNotFound"/>
 <page content="org.eclipse.ui.internal.introview" label="LabelNotFound"/>
 <page content="org.eclipse.ui.cheatsheets.views.CheatSheetView" label="LabelNotFound"/>
 </folder>
 </info>
 <info part="org.knime.workbench.ui.navigator.KnimeResourceNavigator" ratio="0.19968553" ratioLeft="254" ratioRight="1018" relationship="2" relative="org.eclipse.ui.internal.ViewStack@6cf236f6"/>
 <info part="org.eclipse.ui.editorss" ratio="0.1994106" ratioLeft="203" ratioRight="815" relationship="2" relative="org.knime.workbench.ui.navigator.KnimeResourceNavigator"/>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@7269dd27" ratio="0.66" ratioLeft="429" ratioRight="221" relationship="4" relative="org.eclipse.ui.editorss">
-<folder activePageID="org.eclipse.birt.report.designer.ui.attributes.AttributeView" appearance="3" expanded="2">
-<page content="org.eclipse.birt.report.designer.ui.attributes.AttributeView" label="Property Editor - Report"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
-<part id="0"/>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@7269dd27" ratio="0.66" ratioLeft="429" ratioRight="221" relationship="4" relative="org.eclipse.ui.editorss">&#x0A;<folder activePageID="org.eclipse.birt.report.designer.ui.attributes.AttributeView" appearance="3" expanded="2">&#x0A;<page content="org.eclipse.birt.report.designer.ui.attributes.AttributeView" label="Property Editor - Report"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
 </presentation>
 </folder>
 </info>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@11f6885b" ratio="0.34923077" ratioLeft="227" ratioRight="423" relationship="4" relative="org.eclipse.ui.internal.ViewStack@6cf236f6">
-<folder activePageID="com.knime.reporting.designer.view.dataset.explorer" appearance="2" expanded="2">
-<page content="com.knime.reporting.designer.view.dataset.explorer" label="Data set view"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
-<part id="0"/>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@11f6885b" ratio="0.34923077" ratioLeft="227" ratioRight="423" relationship="4" relative="org.eclipse.ui.internal.ViewStack@6cf236f6">&#x0A;<folder activePageID="com.knime.reporting.designer.view.dataset.explorer" appearance="2" expanded="2">&#x0A;<page content="com.knime.reporting.designer.view.dataset.explorer" label="Data set view"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
 </presentation>
 </folder>
 </info>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@50721793" ratio="0.24822696" ratioLeft="105" ratioRight="318" relationship="4" relative="org.eclipse.ui.internal.ViewStack@11f6885b">
-<folder activePageID="org.eclipse.gef.ui.palette_view" appearance="2" expanded="2">
-<page content="org.eclipse.gef.ui.palette_view" label="Palette"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
-<part id="0"/>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@50721793" ratio="0.24822696" ratioLeft="105" ratioRight="318" relationship="4" relative="org.eclipse.ui.internal.ViewStack@11f6885b">&#x0A;<folder activePageID="org.eclipse.gef.ui.palette_view" appearance="2" expanded="2">&#x0A;<page content="org.eclipse.gef.ui.palette_view" label="Palette"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
 </presentation>
 </folder>
 </info>
@@ -242,41 +226,7 @@
 </perspective>
 </perspectives>
 <workingSets/>
-<navigationHistory>
-<editors>
-<editor factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" id="org.knime.workbench.editor.WorkflowEditor" uri="knime://LOCAL/Example%20Workflow/workflow.knime"/>
-<editor factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" id="org.knime.workbench.editor.WorkflowEditor" uri="knime://LOCAL/Collaborative%20Assignment/workflow.knime"/>
-<editor factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" id="org.eclipse.birt.report.designer.ui.editors.ReportEditor" uri="file:/Users/malarcon/Google%20Drive/CUNY/IS607/submissions/knime-workspace/Collaborative%20Assignment/default_report.rptdesign"/>
-<editor factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" id="org.knime.workbench.editor.WorkflowEditor" uri="knime://LOCAL/Collaborative%20Assignment/workflow.knime"/>
-<editor factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" id="org.eclipse.birt.report.designer.ui.editors.ReportEditor" uri="file:/Users/malarcon/Google%20Drive/CUNY/IS607/submissions/knime-workspace/Collaborative%20Assignment/default_report.rptdesign"/>
-<editor factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" id="org.knime.workbench.editor.WorkflowEditor" uri="knime://LOCAL/Example%20Workflow/workflow.knime"/>
-<editor factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" id="org.eclipse.birt.report.designer.ui.editors.ReportEditor" uri="file:/Users/malarcon/Google%20Drive/CUNY/IS607/submissions/knime-workspace/Collaborative%20Assignment/default_report.rptdesign"/>
-</editors>
-<item historyLabel="0: Example Workflow" index="0"/>
-<item historyLabel="2: Collaborative Assignment" index="1"/>
-<item historyLabel="0: Example Workflow" index="0"/>
-<item historyLabel="2: Collaborative Assignment" index="1"/>
-<item historyLabel="Report: Collaborative Assignment" index="2"/>
-<item historyLabel="2: Collaborative Assignment" index="1"/>
-<item historyLabel="Report: Collaborative Assignment" index="2"/>
-<item historyLabel="2: Collaborative Assignment" index="1"/>
-<item historyLabel="Report: Collaborative Assignment" index="2"/>
-<item historyLabel="0: Example Workflow" index="0"/>
-<item historyLabel="0: Collaborative Assignment" index="3"/>
-<item historyLabel="0: Collaborative Assignment" index="3"/>
-<item historyLabel="0: Collaborative Assignment" index="3"/>
-<item historyLabel="0: Collaborative Assignment" index="3"/>
-<item historyLabel="0: Collaborative Assignment" index="3"/>
-<item historyLabel="0: Collaborative Assignment" index="3"/>
-<item historyLabel="0: Collaborative Assignment" index="3"/>
-<item historyLabel="0: Collaborative Assignment" index="3"/>
-<item historyLabel="Report: Collaborative Assignment" index="4"/>
-<item historyLabel="0: Collaborative Assignment" index="3"/>
-<item historyLabel="0: Collaborative Assignment" index="3"/>
-<item historyLabel="0: Example Workflow" index="5"/>
-<item historyLabel="Report: Collaborative Assignment" index="6"/>
-<item active="true" historyLabel="2: Collaborative Assignment" index="3"/>
-</navigationHistory>
+<navigationHistory/>
 </page>
 <workbenchWindowAdvisor/>
 <actionBarAdvisor/>
