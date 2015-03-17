@@ -1,5 +1,5 @@
 ---
-title: "The Dreadful Team Assignment"
+title: "The Dreadful Team Project"
 author: "Mauricio Alarcon"
 date: "March 17, 2015"
 output: ioslides_presentation
@@ -16,22 +16,56 @@ output: ioslides_presentation
 * Trying to schedule a time to meet is a nightmare.
 * Group projects make me want to cause mental or physical harm to all the other group members.
 
-Source: http://www.buzzfeed.com/joannaborns/how-much-do-you-hate-group-projects
+<center>Source: http://www.buzzfeed.com/joannaborns/how-much-do-you-hate-group-projects</center>
 
-## 
+## Your Typical Group
 
-<p align="center"><img align="center" width="500" height="123" src="https://raw.githubusercontent.com/rmalarc/is607/master/assignment7/data.png"></p>
+<p align="center"><img align="center" width="640" height="480" src="https://raw.githubusercontent.com/rmalarc/is607/master/working_in_groups/teammates.gif"></p>
 
 
-## Slide with R Code and Output
+## As a Famous Celebrity Once Said
 
-```{r}
-summary(cars)
-```
+<p align="center"><img align="center" width="400" height="498" src="https://raw.githubusercontent.com/rmalarc/is607/master/working_in_groups/chuck.jpg"></p>
 
-## Slide with Plot
+## Pitfals
 
-```{r, echo=FALSE}
-plot(cars)
-```
+* Poor and disparate communication
+* Lack of visibility of what others are doing
+* Limited time availability
+* Disparate skills
 
+## The Strategy
+
+* Break up work into small chunks that can be carried out independently (Agile style)
+* Recognize team's needs:
+    * Working with code collaboratively
+    * Project management
+    * Educational objectives of assignment
+* Rely on collaboration tools for: 
+    * Code Management: **Github**
+    * Project management and communication: **Trello**
+* Yes, if it was just you, the work would get done in much less
+
+## The Goal
+
+Week 1:
+
+* Have a collaboration baseline in place
+* Have a "development environment" that consists of:
+    * Database server housing data source and model
+    * Basic scripts/API that illustrates how to connect to data source
+    * Tidied up data source
+
+<center>**BY WEEKS END, EVERYONE HAS WHAT THEY NEED IN ORDER TO START PLAYING WITH THE DATA INDEPENDENTLY**</center>
+
+## The Goal
+
+Week 2:
+
+* Complete submission sections:
+    * Data source
+    * Descriptive statistics
+    * Data visualization
+    * Data modeling
+* Prepare for presentation
+* Polish submission
