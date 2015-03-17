@@ -1,0 +1,65 @@
+---
+title: "Poisson(lambda=x) vs Normal(mean=x, sd=sqrt(x))"
+author: "Mauricio Alarcon"
+date: "March 12, 2015"
+output: html_document
+---
+
+For any given dataset with mean=x and sd=sqrt(x), both the Poisson and Normal distributions can be good pdfs.
+
+In this example, I'm comparing poisson and normal distributions with the following paramenters:
+
+* **Mean:** 25
+* **Standard Deviation:** 5
+* **Lambda:** 25
+
+Both Poisson(lambda=25) and Normal(mean=25, sd=5) are awfully similar as we can see below:
+
+* * * 
+### Summary
+```{r, kable,echo=FALSE, warning=FALSE, message=FALSE}
+library(ggplot2)
+library(reshape)
+library(knitr)
+
+range<-c(5:45)
+mean<-25
+sd<-sqrt(mean)
+#load poisson data
+distributions <- data.frame(dist=sprintf("Poisson(lambda=%i)",mean)
+                            ,x=range
+                            ,y=dpois(range,mean)
+                            )
+# add normal data
+distributions <- rbind(distributions
+                       ,data.frame(dist=sprintf("Normal(mean=%i, sd=%i)",mean,sd)
+                                   ,x=range
+                                   ,y=dnorm(range,mean,sd)
+                                   )
+                       )
+
+
+options(digits=4)
+kable(summary(cast(distributions, x ~ dist)))
+```
+
+* * * 
+
+###Histograms
+```{r, echo=FALSE}
+qplot(x,y,data=distributions
+      ,color=dist
+      ,facets=dist~.
+      ,fill=dist
+      ,geom=c( "line")) + theme(legend.position="none")
+```
+
+* * * 
+
+### Question
+
+If I have a dataset and find that sd=sqrt(mean), what's the criteria for favoring one distribution vs the other?
+
+
+
+* * * 
