@@ -3,7 +3,7 @@
    <book>
       <title>Drive: The Surprising Truth About What Motivates Us</title>
       <authors>
-         <book>Daniel Pink</book>
+         <author>Daniel Pink</author>
       </authors>
       <hardcover_price>10.72</hardcover_price>
       <kindle_price>7.99</kindle_price>
@@ -12,7 +12,7 @@
    <book>
       <title>Quiet: The Power of Introverts in a World That Can't Stop Talking</title>
       <authors>
-         <book>Susan Cain</book>
+         <author>Susan Cain</author>
       </authors>
       <hardcover_price>17.91</hardcover_price>
       <kindle_price>8.99</kindle_price>
@@ -21,8 +21,8 @@
    <book>
       <title>Switch: How to Change Things When Change Is Hard</title>
       <authors>
-         <book>Chip Heath</book>
-         <book>Dan Heath</book>
+         <author>Chip Heath</author>
+         <author>Dan Heath</author>
       </authors>
       <hardcover_price>17.63</hardcover_price>
       <kindle_price>11.99</kindle_price>

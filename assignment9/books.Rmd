@@ -23,17 +23,59 @@ The data was saved in three different formats:
 * JSON
 * XML
 
-## Getting JSON Data in R
+## The Libraries
+
 ```{r}
-require("rjson")
-json_data <- "http://webonastick.com/uscl/feeds/uscl.json.txt"
-books_json <- fromJSON(file=json_data)
+library(RCurl)
+library(knitr)
+library(rjson)
+library(plyr)
+library(XML)
+```
+
+## Getting JSON Data in R
+
+```{r}
+json_data_url <- "https://raw.githubusercontent.com/rmalarc/is607/master/assignment9/books.json"
+json_data <- getURL(json_data_url)
+
+books_json_data <- fromJSON(json_data)
+
+books_json_df <- ldply(books_json_data,  function(x) { data.frame(x) } )
+
+kable(books_json_df)
+
 ```
 
 ## Getting XML Data in R
-```{r}
-require(XML)
-xml_data <- xmlParse("http://forecast.weather.gov/MapClick.php?lat=29.803&lon=-82.411&FcstType=digitalDWML")
 
-books_xml <- xmlToList(xml_data)
+```{r}
+xml_data_url <- "https://raw.githubusercontent.com/rmalarc/is607/master/assignment9/books.xml"
+xml_data <- getURL(xml_data_url)
+books_xml_list <- xmlToList(xmlParse(xml_data))
+
+books_xml_df <- ldply(books_xml_list, function(x) { data.frame(x) } )
+
+kable(books_xml_df)
+```
+
+
+## Getting HTML Data in R
+
+```{r}
+html_data_url <- "https://raw.githubusercontent.com/rmalarc/is607/master/assignment9/books.html"
+html_data <- getURL(html_data_url)
+
+#get all the tables in the data
+book_tables <- readHTMLTable(html_data)
+
+# get the row number for all tables in html
+n.rows <- unlist(lapply(book_tables, function(t) dim(t)[1]))
+
+# select the table with the most rows
+books_html_df<- book_tables[[which.max(n.rows)]]
+
+
+kable(books_html_df)
+
 ```
