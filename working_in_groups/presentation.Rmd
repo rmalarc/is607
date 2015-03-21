@@ -42,6 +42,7 @@ output: ioslides_presentation
     * Project management
     * Educational objectives of assignment
 * Rely on collaboration tools for: 
+    * Sharing Data: **PSQL Server**
     * Code Management: **Github**
     * Project management and communication: **Trello**
 * Yes, if it was just you, the work would get done in much less
@@ -52,6 +53,7 @@ Week 1:
 
 * Have a collaboration baseline in place
 * Have a "development environment" that consists of:
+    * A github repo where everyone can commit code
     * Database server housing data source and model
     * Basic scripts/API that illustrates how to connect to data source
     * Tidied up data source
