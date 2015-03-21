@@ -1,0 +1,30 @@
+[
+  {
+    "title": "Drive: The Surprising Truth About What Motivates Us",
+    "authors": [
+      "Daniel Pink"
+    ],
+    "publish_date": "April 5, 2011",
+    "hardcover_price":10.72,
+    "kindle_price":7.99
+  },
+  {
+    "title": "Quiet: The Power of Introverts in a World That Can't Stop Talking",
+    "authors": [
+      "Susan Cain"
+    ],
+    "publish_date": "January 24, 2012",
+    "hardcover_price":17.91,
+    "kindle_price":8.99
+  },
+  {
+    "title": "Switch: How to Change Things When Change Is Hard",
+    "authors": [
+      "Chip Heath",
+      "Dan Heath"
+    ],
+    "publish_date": "February 16, 2010",
+    "hardcover_price":17.63,
+    "kindle_price":11.99
+  }
+]

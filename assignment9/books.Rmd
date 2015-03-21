@@ -1,0 +1,39 @@
+---
+title: 'Week 9: XML and JSON'
+author: "Mauricio Alarcon"
+date: "March 21, 2015"
+output: html_document
+---
+
+##Summary
+
+This is a warm up exercise to help you to get more familiar with the HTML, XML, and JSON file formats, and using packages to read these data formats for downstream use in R data frames. In the next two class weeks, we’ll be loading these file formats from the web, using web scraping and web APIs.
+
+I selected three of my favorite books along with the following attributes:
+
+* Title
+* Authors
+* Publishe Date
+* Hardcover Price
+* Kindle Price
+
+The data was saved in three different formats:
+
+* HTML
+* JSON
+* XML
+
+## Getting JSON Data in R
+```{r}
+require("rjson")
+json_data <- "http://webonastick.com/uscl/feeds/uscl.json.txt"
+books_json <- fromJSON(file=json_data)
+```
+
+## Getting XML Data in R
+```{r}
+require(XML)
+xml_data <- xmlParse("http://forecast.weather.gov/MapClick.php?lat=29.803&lon=-82.411&FcstType=digitalDWML")
+
+books_xml <- xmlToList(xml_data)
+```
