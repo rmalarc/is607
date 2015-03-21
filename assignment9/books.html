@@ -75,7 +75,7 @@ img {
 <ul>
 <li>Title</li>
 <li>Authors</li>
-<li>Publishe Date</li>
+<li>Publish Date</li>
 <li>Hardcover Price</li>
 <li>Kindle Price</li>
 </ul>
@@ -161,12 +161,12 @@ kable(books_xml_df)</code></pre>
 <tr class="header">
 <th align="left">.id</th>
 <th align="left">title</th>
-<th align="left">book</th>
+<th align="left">author</th>
 <th align="left">hardcover_price</th>
 <th align="left">kindle_price</th>
 <th align="left">publish_date</th>
-<th align="left">authors.book</th>
-<th align="left">authors.book.1</th>
+<th align="left">authors.author</th>
+<th align="left">authors.author.1</th>
 </tr>
 </thead>
 <tbody>
@@ -222,11 +222,11 @@ kable(books_html_df)</code></pre>
 <table>
 <thead>
 <tr class="header">
-<th align="left">Title</th>
-<th align="left">Authors</th>
-<th align="left">Publish Date</th>
-<th align="left">Hardcover Price</th>
-<th align="left">Kindle Price</th>
+<th align="left">title</th>
+<th align="left">authors</th>
+<th align="left">publish_date</th>
+<th align="left">hardcover_price</th>
+<th align="left">kindle_price</th>
 </tr>
 </thead>
 <tbody>
@@ -246,13 +246,25 @@ kable(books_html_df)</code></pre>
 </tr>
 <tr class="odd">
 <td align="left">Switch: How to Change Things When Change Is Hard</td>
-<td align="left">Chip Heath, Dan Heath</td>
+<td align="left">Chip Heath</td>
+<td align="left">February 16, 2010</td>
+<td align="left">17.63</td>
+<td align="left">11.99</td>
+</tr>
+<tr class="even">
+<td align="left">Switch: How to Change Things When Change Is Hard</td>
+<td align="left">Dan Heath</td>
 <td align="left">February 16, 2010</td>
 <td align="left">17.63</td>
 <td align="left">11.99</td>
 </tr>
 </tbody>
 </table>
+</div>
+<div id="conclusion" class="section level2">
+<h2>Conclusion</h2>
+<p>Even though there are R-libraries available for loading XML, HMTL, and JSON, the resulting R-dataframe schema varies slightly.</p>
+<p>In addition, the different data-sources have unique challenges, particularly with HTML where handling documents that contain multiple tables can be a challenge.</p>
 </div>
 
 

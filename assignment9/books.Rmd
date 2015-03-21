@@ -13,7 +13,7 @@ I selected three of my favorite books along with the following attributes:
 
 * Title
 * Authors
-* Publishe Date
+* Publish Date
 * Hardcover Price
 * Kindle Price
 
@@ -79,3 +79,9 @@ books_html_df<- book_tables[[which.max(n.rows)]]
 kable(books_html_df)
 
 ```
+
+##Conclusion
+
+Even though there are R-libraries available for loading XML, HMTL, and JSON, the resulting R-dataframe schema varies slightly.
+
+In addition, the different data-sources have unique challenges, particularly with HTML where handling documents that contain multiple tables can be a challenge.
