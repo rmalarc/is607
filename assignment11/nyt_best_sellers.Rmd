@@ -1,0 +1,73 @@
+---
+title: 'Week 9: XML and JSON'
+author: "Mauricio Alarcon"
+date: "April 13, 2015"
+output: html_document
+---
+
+##Summary
+
+In this excercise we will be playing with the [Best Seller List API](http://developer.nytimes.com/docs/read/best_sellers_api) from the New York Times. The goal is to present the current best seller business books including the following attributes:
+
+* List 
+* Date
+* Title
+* Author
+* URL to Amazon
+
+
+## The Libraries
+
+```{r, warning=FALSE, message=FALSE}
+library(RCurl)
+library(knitr)
+library(rjson)
+library(plyr)
+library(dplyr)
+```
+
+## Getting NYT Best Sellers List Data in R
+
+```{r}
+# This Application's NYT API Key
+nyt_api_key <- "728ba805a597c4509f398de34e5ce582:10:62407509"
+
+# Best seller list to query
+nty_best_seller_list <- "Business-Books"
+
+# Create the URL
+json_data_url <- paste("http://api.nytimes.com/svc/books/v3/lists?api-key=",nyt_api_key,"&list=",nty_best_seller_list)
+
+# get the RAW JSON data
+json_data <- getURL(json_data_url)
+
+# Parse into a list
+nyt_best_sellers_data <- fromJSON(json_data)
+
+
+# Get the results from the list
+best_sellers_list <- nyt_best_sellers_data[["results"]]
+
+# turn into a dataframe
+books_json_df <- ldply(nyt_best_sellers_data[["results"]],  function(x) { data.frame(x) } )
+
+# Store the list name and date into a separate variable
+list_date <- books_json_df[1,"bestsellers_date"]
+list_name <- books_json_df[1,"display_name"]
+
+# Select the columns we want to show
+books_json_df <- books_json_df %>%
+  select(rank,book_details.title,book_details.author,amazon_product_url)
+
+```
+
+
+##The Output
+
+* **Category:** `r list_name`
+* **Date:** `r list_date`
+
+```{r, echo=FALSE}
+kable(books_json_df)
+```
+
