@@ -1,5 +1,5 @@
 ---
-title: 'Week 9: XML and JSON'
+title: 'Week 11: Getting Data From a Web API Using R'
 author: "Mauricio Alarcon"
 date: "April 13, 2015"
 output: html_document
@@ -7,14 +7,15 @@ output: html_document
 
 ##Summary
 
-In this excercise we will be playing with the [Best Seller List API](http://developer.nytimes.com/docs/read/best_sellers_api) from the New York Times. The goal is to present the current best seller business books including the following attributes:
+In this excercise we will be playing with the [Best Seller List API](http://developer.nytimes.com/docs/read/best_sellers_api) from the New York Times.
+
+The goal is to get the best seller business books including the following attributes:
 
 * List 
 * Date
 * Title
 * Author
 * URL to Amazon
-
 
 ## The Libraries
 
