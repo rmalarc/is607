@@ -1,0 +1,146 @@
+---
+title: 'Week 12: MongoDB'
+author: "Mauricio Alarcon"
+date: "April 18, 2015"
+output: html_document
+---
+
+##Summary
+
+In this excercise we will be playing with the [NYC Public High School Program Data](https://data.cityofnewyork.us/Education/NYC-Public-High-School-Program-Data/mreg-rk5p) from the NYC OpenData Catalog.
+
+
+The goal is to:
+
+* Import the catalog into MongoDB
+* Load the catalog into R
+* Present data including the following attributes:
+  * Programs by Borough
+  * Programs by Interest Area 
+
+## The Libraries
+
+```{r, warning=FALSE, message=FALSE}
+library(RCurl)
+library(rjson)
+library(knitr)
+library(rmongodb)
+library(plyr)
+library(dplyr)
+```
+
+
+## Importing the data into MongoDB
+
+Unfortunatelly the mongoimport command has it's limitations. In the process of experimenting with the data I stumbled upon a couple of limitations:
+
+* Unable to import data with greater than 16MB
+* The schema of the data source needed some tidying.
+
+Therefore, I decided to import the data into Mongo thru this R-script.
+
+```{r}
+# url to data
+json_data_url <- "https://data.cityofnewyork.us/api/views/mreg-rk5p/rows.json?accessType=DOWNLOAD"
+# get the RAW JSON data
+json_data <- getURL(json_data_url)
+
+# Parse into a list
+nyc_school_Programs <- fromJSON(json_data)
+
+# Get the column names form the dataset
+nyc_data_columns <- nyc_school_Programs[["meta"]][["view"]][["columns"]]
+
+colnames <- c()
+for (i in nyc_data_columns){
+  colnames <- c(colnames,i[["name"]])
+}
+
+# Get the data from the dataset
+nyc_data_data <- nyc_school_Programs[["data"]]
+
+#turn data into dataframe
+
+nyc_data <- data.frame(matrix(unlist(nyc_data_data), ncol=length(colnames), byrow=T))
+
+colnames(nyc_data) <- colnames
+
+#importing the data into JSON
+# convert data back via DF -> JSON -> BSON -> MONGODB
+
+
+nyc_data_json<-apply(nyc_data,1,function(x) toJSON(x))
+
+write(nyc_data_json,"~/nyc_data_json.json")
+
+```
+
+The resulting file is then imported using mongoimport as follows:
+
+`
+mongoimport ~/nyc_data_json.json 
+`
+
+## Connecting to MongoDB
+
+```{r}
+mongo <- mongo.create()
+coll <- "test.nyc_data_json"
+```
+
+
+# Programs by Borough
+
+
+```{r}
+
+if(mongo.is.connected(mongo) == TRUE) {
+  pipe_1 <- mongo.bson.from.JSON('
+            {"$group":
+              {"_id":"$Borough","Programs":{"$sum":1}}
+            }')
+  cmd_list <- list(pipe_1)
+  totalPrograms <- mongo.aggregation(mongo, coll, cmd_list)
+  
+  ltotalPrograms <- mongo.bson.value(totalPrograms , "result")
+  mtotalPrograms  <- sapply(ltotalPrograms , 
+                    function(x) return( c(x$'_id',x$Programs)) )
+  dtotalPrograms  <- as.data.frame(t(mtotalPrograms ))
+  rownames(dtotalPrograms ) <- dtotalPrograms [,1]
+  colnames(dtotalPrograms ) <- c("Borough", "Programs")
+  head(dtotalPrograms)
+  dtotalPrograms$Programs <- as.numeric(as.character(dtotalPrograms$Programs))
+
+  plot(dtotalPrograms,main='High School Programs by Borough')
+
+  kable(dtotalPrograms[c(2)])
+}
+```
+
+
+# Programs by Interest Area
+
+
+```{r}
+
+if(mongo.is.connected(mongo) == TRUE) {
+  pipe_1 <- mongo.bson.from.JSON('
+            {"$group":
+              {"_id":"$Interest Area","Programs":{"$sum":1}}
+            }')
+  cmd_list <- list(pipe_1)
+  totalPrograms <- mongo.aggregation(mongo, coll, cmd_list)
+  
+  ltotalPrograms <- mongo.bson.value(totalPrograms , "result")
+  mtotalPrograms  <- sapply(ltotalPrograms , 
+                    function(x) return( c(x$'_id',x$Programs)) )
+  dtotalPrograms  <- as.data.frame(t(mtotalPrograms ))
+  rownames(dtotalPrograms ) <- dtotalPrograms [,1]
+  colnames(dtotalPrograms ) <- c("Interest Area", "Programs")
+  head(dtotalPrograms)
+  dtotalPrograms$Programs <- as.numeric(as.character(dtotalPrograms$Programs))
+
+  kable(dtotalPrograms[c(2)])
+}
+```
+
