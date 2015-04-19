@@ -1,0 +1,121 @@
+---
+title: 'Project 4: Scraping R-Bloggers'
+author: "Mauricio Alarcon"
+date: "April 18, 2015"
+output: html_document
+---
+
+##Summary
+
+The site r-bloggers is a team blog, with a lot of great how-to content on various R topics. The page http://www.r-bloggers.com/search/web%20scraping provides a list of topics related to web scraping, which is also the topic of this project!
+
+The goal is to:
+
+* From each blog entry page scrap the title, date, author, description, URL and page
+* Iterate the above thru all the available pages
+
+## The Libraries
+
+```{r, warning=FALSE, message=FALSE}
+library(RCurl)
+library(XML)
+library(rvest)
+library(knitr)
+library(plyr)
+library(stringr)
+```
+
+## scrape_r_bloggers_page Function
+
+In order to facilitate scraping more than one page, we will use the following function:
+
+```{r}
+
+scrape_r_bloggers_page <- function(page_data,page){  
+  
+  # Get all posts from within page by selecting DIVs where ID contains "post"
+  blog_posts<- page_data %>% 
+    html_nodes(xpath='//div[contains(@id,"post")]')
+
+  # Pull out all the components within the blog post by xpath
+
+  titles<- blog_posts %>% 
+    html_nodes(xpath='h2/a/text()')
+
+  descriptions<- blog_posts %>% 
+    html_nodes(xpath='div[2]/p[1]')
+
+  dates<- blog_posts %>% 
+    html_nodes(xpath='div[1]/div')
+
+  authors<- blog_posts %>% 
+    html_nodes(xpath='div[1]/a')
+
+  urls<- blog_posts %>% 
+    html_nodes(xpath='h2/a')
+  
+  # Convert objects to array of values
+  descriptions<- sapply(descriptions,xmlValue)   
+  titles<- sapply(titles,xmlValue)   
+  dates<- sapply(dates,xmlValue)   
+  authors<- sapply(authors,xmlValue)
+  authors <- gsub("\\/\\*.+\\*\\/","",authors) # cleanup comments
+  urls<- ldply(urls, function(x) xmlAttrs(x)["href"])
+  colnames(urls)<-"url"
+
+  # store it all into one dataframe
+  blog_posts_df <- data.frame(title=titles
+                              ,description=descriptions
+                              ,author=authors
+                              ,date=dates
+                              ,url=urls
+                              ,page=page)
+  return(blog_posts_df)
+}
+
+```
+
+
+## Scraping the Blog Posts
+
+```{r}
+
+theURL <- "http://www.r-bloggers.com/search/web%20scraping"
+
+
+page_data <- html(theURL)
+
+#get the total number of pages
+pages<- page_data %>%
+  html_nodes(xpath='//*[@id="leftcontent"]/div[11]/span[1]')
+pages<-sapply(pages,xmlValue)
+
+pages<-as.numeric(str_extract(pages,"[0-9]+$"))
+
+
+#call the function to scrape the page
+blog_posts_df<-scrape_r_bloggers_page(page_data,1)
+
+
+```
+
+## Get the Remaining Pages
+
+```{r}
+#loop thru the remaining pages
+for (page in c(2:pages)){
+  Sys.sleep(1)
+  theURL <- paste("http://www.r-bloggers.com/search/web%20scraping/page/",page,"/",sep="")
+  page_data <- html(theURL)
+  blog_posts_df<-rbind(blog_posts_df,scrape_r_bloggers_page(page_data,page))
+}
+
+```
+
+## The output
+
+```{r}
+
+kable(blog_posts_df[c("title","author","date","url","page")])
+
+```
