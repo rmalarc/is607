@@ -75,7 +75,7 @@ write(nyc_data_json,"~/nyc_data_json.json")
 
 ```
 
-The resulting file is then imported using mongoimport as follows:
+The [resulting file](https://raw.githubusercontent.com/rmalarc/is607/5471a74ea8d15aea06a5f7f4039c637411919558/assignment12/nyc_data_json.json) is then imported using mongoimport as follows:
 
 `
 mongoimport ~/nyc_data_json.json 
