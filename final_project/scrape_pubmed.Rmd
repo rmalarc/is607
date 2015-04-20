@@ -5,16 +5,24 @@ date: "April 18, 2015"
 output: html_document
 ---
 
-##Summary
+#Summary
 
-The site r-bloggers is a team blog, with a lot of great how-to content on various R topics. The page http://www.r-bloggers.com/search/web%20scraping provides a list of topics related to web scraping, which is also the topic of this project!
+When analyzing health data, it is very important to define control groups. The definition of control groups can be quite challenging and often times a limitation for large-scale data mining projects.
 
-The goal is to:
+Let's say that we want to analyze a set of observations for patients with end stage kidney disease with the goal of establishing an early diagnosis. 
 
-* Find the 
-* Iterate the above thru all the available pages
+We first want to know what type of observations are more often found in this population. In order to do this analysis, we need a good control group, preferable composed of precursors or populations that may have a high risk for developing the disease of interest.
 
-## The Libraries
+The purpose of this project is to build a database of diseases and other related diseases by srapping a well-known clinical literature search engine such as [PubMed](http://www.ncbi.nlm.nih.gov/pubmed).
+
+Let's say D is the set of disease terms such that d is a given disease term. In this case, we will use disease terms found in ICD9 classification data.
+
+The goal is to obtain frequency counts of:
+* Individual disease terms: Diabetes, Cancer, HIV, etc.
+* All disease terms combinations: Diabetes AND Cancer, Diabetes AND HIV, etc.
+
+
+#The Libraries
 
 ```{r, warning=FALSE, message=FALSE}
 library(RCurl)
@@ -25,9 +33,11 @@ library(plyr)
 library(stringr)
 library(rmongodb)
 library(rjson)
+library(tm)
+
 ```
 
-## Loading Diesease Phrases
+#Loading Diesease Phrases
 
 The Healthcare Utilization Project (HCUP) has an ICD9 classification data available in [their website](https://www.hcup-us.ahrq.gov/toolssoftware/ccs/ccs.jsp).
 
@@ -47,20 +57,24 @@ kable(summary(dxref_data))
 kable(head(dxref_data,n=25))
 ```
 
-## Preparing the Disease Phrases
+#Preparing the Disease Terms
 
-In order to use the disease phrases we need to:
+In order to use the disease terms we need to:
 
 * Clean up strings (remove numbers, punctuation, convert to lower-case)
 * Remove stop words
 * URL Encode the phrases
 
 ```{r}
-library(tm)
+
+# flag those terms that appear to be invalid
+dxref_data$is_valid <- TRUE
+dxref_data[dxref_data$CCS.DIAGNOSIS.CATEGORIES %in%
+             c(".Z  ",".   ",".A  ","254","255","256","257","258","259"),"is_valid"] <-FALSE 
+dxref_data[grep("E Codes: ",dxref_data$CCS.DIAGNOSIS.CATEGORIES.LABELS),"is_valid"] <-FALSE 
 
 # gsub helper function
 toString <- content_transformer(function(x, from, to) gsub(from, to, x))
-
 
 #load data into corpus
 dxref_data_corpus <- Corpus(VectorSource(dxref_data[2]))
@@ -68,14 +82,18 @@ dxref_data_corpus <- Corpus(VectorSource(dxref_data[2]))
 #remove numbers
 dxref_data_corpus <- tm_map(dxref_data_corpus, removeNumbers)
 
+# to lowercase
+dxref_data_corpus <- tm_map(dxref_data_corpus, content_transformer(tolower))
+
+# remove the stuff in parentesis
+dxref_data_corpus <- tm_map(dxref_data_corpus, toString, "\\(.+\\)", "")
+
 # replace / or - for whitespace
 dxref_data_corpus <- tm_map(dxref_data_corpus, toString, "(/|-)", " ")
 
 #remove punctuation
 dxref_data_corpus <- tm_map(dxref_data_corpus, removePunctuation)
 
-# to lowercase
-dxref_data_corpus <- tm_map(dxref_data_corpus, content_transformer(tolower))
 
 # remove english stop words
 dxref_data_corpus <- tm_map(dxref_data_corpus, removeWords, stopwords("english"))
@@ -87,15 +105,22 @@ dxref_data_corpus <- tm_map(dxref_data_corpus, stripWhitespace)
 
 # merge with dataframe
 dxref_data$disease_phrase <- dxref_data_corpus[["1"]][["content"]]
-dxref_data$disease_phrase_url <- sapply(dxref_data$disease_phrase,URLencode)
+dxref_data$url_params <- sapply(dxref_data$disease_phrase,URLencode)
 
 ```
-## scrape_r_bloggers_page Function
 
-In order to facilitate scraping more than one page, we will use the following function:
+#Helper Functions
+
+In order to facilitate scraping more than one page, we will use the following functions:
 
 ```{r}
-#URLParams <- batch[6,"disease_phrase_url"]
+####################################################################################
+# pubmed_entries_for(URLParams)
+#
+# This function scrapes pubmed by searching for the specified URL encoded keyword.
+# The function returns the number of entries in pubmed for the keyword.
+####################################################################################
+
 pubmed_entries_for <-function(URLParams) {
   Sys.sleep(1)
   baseURL <- "http://www.ncbi.nlm.nih.gov/pubmed?term="
@@ -116,52 +141,107 @@ pubmed_entries_for <-function(URLParams) {
   return(pubmed_results)
 }
 
+####################################################################################
+# scrape_pubmed_entries(ref_data, entry_type)
+#
+# This function accepts a dataframe containing the entries to process as well as an entry_type.
+# The DF must contain a column called url_params, which are the URL parameters passed to
+# pubmed_entries_for.
+# 
+# The processed output is saved to MongoDB and returned as a dataframe
+####################################################################################
+scrape_pubmed_entries <- function(ref_data,entry_type) {
+  #ref_data<-dxref_data
+  #entry_type<-"absolute_count"
+  
+  coll<-paste(ns,entry_type,sep=".")
+  entries_processed <- NA
+  # get previously exported records
+  buf <- mongo.bson.buffer.create()
+  mongo.bson.buffer.append(buf, "entry_type", entry_type)
+  mongo_query <- mongo.bson.from.buffer(buf)
+  entries_processed <- mongo.cursor.to.data.frame(mongo.find(m,coll,mongo_query))
+
+  # process records not already processed
+  entries_to_process <- ref_data[!(ref_data$url_params %in% entries_processed$url_params),]
+
+  if(nrow(entries_to_process)>0){
+    for (i in 1:nrow(entries_to_process)){
+      entry<-entries_to_process[i,]
+      # get the number of hits for entry in pubmed
+      hits<-pubmed_entries_for(entry$url_params)
+
+      # resulting DF
+      results<-entry
+      results$entry_type <- entry_type
+      results$hits<-hits
+
+      # export to mongo
+      mongo.insert(m, coll,mongo.bson.from.JSON(toJSON(results)))
+    }
+  }
+  
+  # get all processed entries
+  entries_processed <- mongo.cursor.to.data.frame(mongo.find(m,coll,mongo_query))
+
+  return(entries_processed)
+}
 ```
 
 
-## Scraping the Blog Posts
+#Scraping the Pubmed Search Engine
+
+##Getting Frequency Counts of Individual Disease Terms
 
 ```{r}
 
 # connect to monogo so we can export the results of the scrape a row at a time
 m <- mongo.create()
-ns <- "test.scrape_pubmed"
+ns <- "scrape_pubmed"
 
 
 # yes, it's a loop. The apply functions are faster. However, the function gets delayed by a sec
 # each time. The loop allows me to restart where I left off
 entries_processed <- NULL
 
-entries_to_process <- dxref_data[!(dxref_data$disease_phrase_url %in% entries_processed$disease_phrase_url),]
-
-for (i in 1:nrow(entries_to_process)){
-  entry<-entries_to_process[i,]
-  hits<-pubmed_entries_for(entry$disease_phrase_url)
-  results<-data.frame(CSS.DIAGNOSIS.CATEGORIES=entry$CCS.DIAGNOSIS.CATEGORIES,
-                                  disease_phrase_url=entry$disease_phrase_url,
-                                  hits=hits)
-  entries_processed <- rbind(entries_processed,results)
-  mongo.insert(m, ns,mongo.bson.from.JSON(toJSON(x)))
+# If you want to restart the whole process from scratch, set restart to TRUE
+restart <- FALSE
+if (restart){
+  #delete all previously processed entries by purging the contents of the MongoDB
+  mongo.remove(m, ns) 
 }
 
+absolute_count_entries_processed <- scrape_pubmed_entries(dxref_data,"absolute_count")
 
-#call the function to scrape the page
-#blog_posts_df<-scrape_r_bloggers_page(page_data,1)
 
+# show a sample of the output
+kable(head(absolute_count_entries_processed,n=25))
 
 ```
 
-## Export the results to MongoDB
+##Getting Frequency Counts of Disease Term Combinations (ie: tuberculosis AND hiv)
+
 ```{r}
-entries_processed$hits <- as.integer(entries_processed$hits)
-apply(entries_processed,1,function(x) {mongo.insert(m
-                                                    , ns
-                                                    ,mongo.bson.from.JSON(
-                                                      toJSON(x)
-                                                      )
-                                                    )
-                                       }
-      )
+# x-join all the VALID terms
+dxref_data_x_join <- merge(x = absolute_count_entries_processed[absolute_count_entries_processed$is_valid,]
+                           , y = absolute_count_entries_processed[absolute_count_entries_processed$is_valid,]
+                           , by = NULL)
+
+dxref_data_x_join$CCS.DIAGNOSIS.CATEGORIES.x<-as.character(dxref_data_x_join$CCS.DIAGNOSIS.CATEGORIES.x)
+dxref_data_x_join$CCS.DIAGNOSIS.CATEGORIES.y<-as.character(dxref_data_x_join$CCS.DIAGNOSIS.CATEGORIES.y)
+
+#Remove permutations, we just want combinations
+dxref_data_x_join <- dxref_data_x_join[dxref_data_x_join$CCS.DIAGNOSIS.CATEGORIES.x
+                                       >dxref_data_x_join$CCS.DIAGNOSIS.CATEGORIES.y,]
+
+# generate combined URL parameters
+dxref_data_x_join$url_params <- sprintf("(%s)AND(%s)",dxref_data_x_join$url_params.x,dxref_data_x_join$url_params.y)
+
+#scrape pubmed
+intersect_count_entries_processed <- scrape_pubmed_entries(dxref_data_x_join,"intersect_count")
+
+#show a sample of the output
+kable(head(intersect_count_entries_processed,n=25))
 
 ```
 
