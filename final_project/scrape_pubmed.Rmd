@@ -1,5 +1,5 @@
 ---
-title: 'Project 4: Scraping R-Bloggers'
+title: 'IS607 Final Project: Scraping R-Bloggers'
 author: "Mauricio Alarcon"
 date: "April 18, 2015"
 output: html_document
@@ -11,7 +11,7 @@ The site r-bloggers is a team blog, with a lot of great how-to content on variou
 
 The goal is to:
 
-* From each blog entry page scrap the title, date, author, description, URL and page
+* Find the 
 * Iterate the above thru all the available pages
 
 ## The Libraries
@@ -23,54 +23,97 @@ library(rvest)
 library(knitr)
 library(plyr)
 library(stringr)
+library(rmongodb)
+library(rjson)
 ```
 
+## Loading Diesease Phrases
+
+The Healthcare Utilization Project (HCUP) has an ICD9 classification data available in [their website](https://www.hcup-us.ahrq.gov/toolssoftware/ccs/ccs.jsp).
+
+There is one file in particular that contains diagnosis category names. This list is great as the disease labels are in [plain english](https://www.hcup-us.ahrq.gov/toolssoftware/ccs/CCSCategoryNames_FullLabels.pdf). 
+
+A CSV version of this file is available in the [Single-Level Diagnosis CCS Categories](https://www.hcup-us.ahrq.gov/toolssoftware/ccs/Single_Level_CCS_2015.zip). This is the data that we will use as our list of diseases.
+
+
+```{r}
+# get files diagnosis category label from CSV in github
+dxref <- "https://raw.githubusercontent.com/rmalarc/is607/master/final_project/Single_Level_CCS_2015/dxlabel%202013.csv"
+dxref_data_csv <- getURL(dxref)
+dxref_data <- read.csv(text=dxref_data_csv,head=TRUE,sep=",",as.is=TRUE)
+
+kable(summary(dxref_data))
+
+kable(head(dxref_data,n=25))
+```
+
+## Preparing the Disease Phrases
+
+In order to use the disease phrases we need to:
+
+* Clean up strings (remove numbers, punctuation, convert to lower-case)
+* Remove stop words
+* URL Encode the phrases
+
+```{r}
+library(tm)
+
+# gsub helper function
+toString <- content_transformer(function(x, from, to) gsub(from, to, x))
+
+
+#load data into corpus
+dxref_data_corpus <- Corpus(VectorSource(dxref_data[2]))
+
+#remove numbers
+dxref_data_corpus <- tm_map(dxref_data_corpus, removeNumbers)
+
+# replace / or - for whitespace
+dxref_data_corpus <- tm_map(dxref_data_corpus, toString, "(/|-)", " ")
+
+#remove punctuation
+dxref_data_corpus <- tm_map(dxref_data_corpus, removePunctuation)
+
+# to lowercase
+dxref_data_corpus <- tm_map(dxref_data_corpus, content_transformer(tolower))
+
+# remove english stop words
+dxref_data_corpus <- tm_map(dxref_data_corpus, removeWords, stopwords("english"))
+
+# strip double white spaces
+dxref_data_corpus <- tm_map(dxref_data_corpus, toString, "^\\s+|\\s+$", "")
+dxref_data_corpus <- tm_map(dxref_data_corpus, toString, "  ", " ")
+dxref_data_corpus <- tm_map(dxref_data_corpus, stripWhitespace)
+
+# merge with dataframe
+dxref_data$disease_phrase <- dxref_data_corpus[["1"]][["content"]]
+dxref_data$disease_phrase_url <- sapply(dxref_data$disease_phrase,URLencode)
+
+```
 ## scrape_r_bloggers_page Function
 
 In order to facilitate scraping more than one page, we will use the following function:
 
 ```{r}
+#URLParams <- batch[6,"disease_phrase_url"]
+pubmed_entries_for <-function(URLParams) {
+  Sys.sleep(1)
+  baseURL <- "http://www.ncbi.nlm.nih.gov/pubmed?term="
+  theURL <- paste(baseURL,URLParams,sep="")
+  page_data <- html(theURL)
 
-scrape_pubmed_bloggers_page <- function(page_data,page){  
-  
-  # Get all posts from within page by selecting DIVs where ID contains "post"
-  blog_posts<- page_data %>% 
-    html_nodes(xpath='//h2[contains(@class,"result_count")]')
+  pubmed_results<- page_data %>% 
+      html_nodes(xpath='//h2[contains(@class,"result_count")]')
 
-  # Pull out all the components within the blog post by xpath
+  pubmed_results<- sapply(pubmed_results,xmlValue)
 
-  titles<- blog_posts %>% 
-    html_nodes(xpath='h2/a/text()')
+  if(length(pubmed_results) > 0){
+    pubmed_results<-as.integer(str_extract(pubmed_results[1],"[0-9]+$"))
+  } else {
+    pubmed_results <- 0
+  }
 
-  descriptions<- blog_posts %>% 
-    html_nodes(xpath='div[2]/p[1]')
-
-  dates<- blog_posts %>% 
-    html_nodes(xpath='div[1]/div')
-
-  authors<- blog_posts %>% 
-    html_nodes(xpath='div[1]/a')
-
-  urls<- blog_posts %>% 
-    html_nodes(xpath='h2/a')
-  
-  # Convert objects to array of values
-  descriptions<- sapply(descriptions,xmlValue)   
-  titles<- sapply(titles,xmlValue)   
-  dates<- sapply(dates,xmlValue)   
-  authors<- sapply(authors,xmlValue)
-  authors <- gsub("\\/\\*.+\\*\\/","",authors) # cleanup comments
-  urls<- ldply(urls, function(x) xmlAttrs(x)["href"])
-  colnames(urls)<-"url"
-
-  # store it all into one dataframe
-  blog_posts_df <- data.frame(title=titles
-                              ,description=descriptions
-                              ,author=authors
-                              ,date=dates
-                              ,url=urls
-                              ,page=page)
-  return(blog_posts_df)
+  return(pubmed_results)
 }
 
 ```
@@ -80,17 +123,26 @@ scrape_pubmed_bloggers_page <- function(page_data,page){
 
 ```{r}
 
-theURL <- "http://www.ncbi.nlm.nih.gov/pubmed?term=(diabetes)%20AND%20hypertension"
+# connect to monogo so we can export the results of the scrape a row at a time
+m <- mongo.create()
+ns <- "test.scrape_pubmed"
 
 
-page_data <- html(theURL)
+# yes, it's a loop. The apply functions are faster. However, the function gets delayed by a sec
+# each time. The loop allows me to restart where I left off
+entries_processed <- NULL
 
-pubmed_results<- page_data %>% 
-    html_nodes(xpath='//h2[contains(@class,"result_count")]')
+entries_to_process <- dxref_data[!(dxref_data$disease_phrase_url %in% entries_processed$disease_phrase_url),]
 
-pubmed_results<- sapply(pubmed_results,xmlValue)
-
-pubmed_results<-as.numeric(str_extract(pubmed_results,"[0-9]+$"))
+for (i in 1:nrow(entries_to_process)){
+  entry<-entries_to_process[i,]
+  hits<-pubmed_entries_for(entry$disease_phrase_url)
+  results<-data.frame(CSS.DIAGNOSIS.CATEGORIES=entry$CCS.DIAGNOSIS.CATEGORIES,
+                                  disease_phrase_url=entry$disease_phrase_url,
+                                  hits=hits)
+  entries_processed <- rbind(entries_processed,results)
+  mongo.insert(m, ns,mongo.bson.from.JSON(toJSON(x)))
+}
 
 
 #call the function to scrape the page
@@ -99,16 +151,17 @@ pubmed_results<-as.numeric(str_extract(pubmed_results,"[0-9]+$"))
 
 ```
 
-## Get the Remaining Pages
-
+## Export the results to MongoDB
 ```{r}
-#loop thru the remaining pages
-for (page in c(2:pages)){
-  Sys.sleep(1)
-  theURL <- paste("http://www.r-bloggers.com/search/web%20scraping/page/",page,"/",sep="")
-  page_data <- html(theURL)
-  blog_posts_df<-rbind(blog_posts_df,scrape_r_bloggers_page(page_data,page))
-}
+entries_processed$hits <- as.integer(entries_processed$hits)
+apply(entries_processed,1,function(x) {mongo.insert(m
+                                                    , ns
+                                                    ,mongo.bson.from.JSON(
+                                                      toJSON(x)
+                                                      )
+                                                    )
+                                       }
+      )
 
 ```
 
@@ -116,6 +169,6 @@ for (page in c(2:pages)){
 
 ```{r}
 
-kable(blog_posts_df[c("title","author","date","url","page")])
+#kable(blog_posts_df[c("title","author","date","url","page")])
 
 ```
