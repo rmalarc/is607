@@ -89,6 +89,11 @@ library(rmongodb)
 library(plyr)
 library(dplyr)</code></pre>
 </div>
+<div id="connecting-to-mongodb" class="section level2">
+<h2>Connecting to MongoDB</h2>
+<pre class="r"><code>mongo &lt;- mongo.create()
+coll &lt;- &quot;test.nyc_data_json&quot;</code></pre>
+</div>
 <div id="importing-the-data-into-mongodb" class="section level2">
 <h2>Importing the data into MongoDB</h2>
 <p>Unfortunatelly the mongoimport command has it’s limitations. In the process of experimenting with the data I stumbled upon a couple of limitations:</p>
@@ -128,14 +133,66 @@ colnames(nyc_data) &lt;- colnames
 
 nyc_data_json&lt;-apply(nyc_data,1,function(x) toJSON(x))
 
-write(nyc_data_json,&quot;~/nyc_data_json.json&quot;)</code></pre>
-<p>The <a href="https://raw.githubusercontent.com/rmalarc/is607/5471a74ea8d15aea06a5f7f4039c637411919558/assignment12/nyc_data_json.json">resulting file</a> is then imported using mongoimport as follows:</p>
-<p><code>mongoimport ~/nyc_data_json.json</code></p>
-</div>
-<div id="connecting-to-mongodb" class="section level2">
-<h2>Connecting to MongoDB</h2>
-<pre class="r"><code>mongo &lt;- mongo.create()
-coll &lt;- &quot;test.nyc_data_json&quot;</code></pre>
+#export to mongo
+apply(nyc_data,1,function(x) {mongo.insert(mongo
+                                                    , coll
+                                                    ,mongo.bson.from.JSON(
+                                                      toJSON(x)
+                                                      )
+                                                    )
+                                       }
+      )</code></pre>
+<pre><code>##   [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+##  [15] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+##  [29] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+##  [43] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+##  [57] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+##  [71] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+##  [85] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+##  [99] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [113] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [127] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [141] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [155] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [169] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [183] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [197] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [211] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [225] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [239] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [253] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [267] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [281] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [295] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [309] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [323] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [337] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [351] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [365] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [379] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [393] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [407] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [421] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [435] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [449] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [463] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [477] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [491] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [505] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [519] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [533] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [547] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [561] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [575] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [589] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [603] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [617] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [631] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [645] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [659] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [673] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [687] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [701] TRUE</code></pre>
 </div>
 <div id="programs-by-borough" class="section level1">
 <h1>Programs by Borough</h1>
@@ -170,24 +227,24 @@ coll &lt;- &quot;test.nyc_data_json&quot;</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
+<td align="left">Staten Island</td>
+<td align="right">53</td>
+</tr>
+<tr class="even">
 <td align="left">Manhattan</td>
 <td align="right">143</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">Brooklyn</td>
 <td align="right">214</td>
-</tr>
-<tr class="odd">
-<td align="left">Bronx</td>
-<td align="right">139</td>
 </tr>
 <tr class="even">
 <td align="left">Queens</td>
 <td align="right">152</td>
 </tr>
 <tr class="odd">
-<td align="left">Staten Island</td>
-<td align="right">53</td>
+<td align="left">Bronx</td>
+<td align="right">139</td>
 </tr>
 </tbody>
 </table>
@@ -226,84 +283,84 @@ coll &lt;- &quot;test.nyc_data_json&quot;</code></pre>
 <td align="right">3</td>
 </tr>
 <tr class="even">
-<td align="left">Animal Science</td>
-<td align="right">4</td>
-</tr>
-<tr class="odd">
-<td align="left">Architecture</td>
-<td align="right">6</td>
-</tr>
-<tr class="even">
 <td align="left">Cosmetology</td>
 <td align="right">4</td>
 </tr>
 <tr class="odd">
-<td align="left">Engineering</td>
-<td align="right">39</td>
+<td align="left">JROTC</td>
+<td align="right">5</td>
 </tr>
 <tr class="even">
-<td align="left">Teaching</td>
-<td align="right">11</td>
+<td align="left">Culinary Arts</td>
+<td align="right">7</td>
 </tr>
 <tr class="odd">
+<td align="left">Computer Science &amp; Technology</td>
+<td align="right">40</td>
+</tr>
+<tr class="even">
 <td align="left">Health Professions</td>
 <td align="right">41</td>
 </tr>
+<tr class="odd">
+<td align="left">Teaching</td>
+<td align="right">11</td>
+</tr>
 <tr class="even">
-<td align="left">Computer Science &amp; Technology</td>
-<td align="right">40</td>
+<td align="left">Animal Science</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">Humanities &amp; Interdisciplinary</td>
+<td align="right">220</td>
+</tr>
+<tr class="even">
+<td align="left">Visual Art &amp; Design</td>
+<td align="right">43</td>
 </tr>
 <tr class="odd">
 <td align="left">Law &amp; Government</td>
 <td align="right">42</td>
 </tr>
 <tr class="even">
-<td align="left">Humanities &amp; Interdisciplinary</td>
-<td align="right">220</td>
+<td align="left">Engineering</td>
+<td align="right">39</td>
 </tr>
 <tr class="odd">
-<td align="left">Visual Art &amp; Design</td>
-<td align="right">43</td>
+<td align="left">Performing Arts</td>
+<td align="right">69</td>
 </tr>
 <tr class="even">
-<td align="left">Communications</td>
-<td align="right">22</td>
-</tr>
-<tr class="odd">
-<td align="left">Film/Video</td>
-<td align="right">8</td>
-</tr>
-<tr class="even">
-<td align="left">Performing Arts/Visual Art &amp; Design</td>
-<td align="right">6</td>
+<td align="left">Business</td>
+<td align="right">34</td>
 </tr>
 <tr class="odd">
 <td align="left">Science &amp; Math</td>
 <td align="right">61</td>
 </tr>
 <tr class="even">
-<td align="left">JROTC</td>
-<td align="right">5</td>
+<td align="left">Zoned</td>
+<td align="right">29</td>
 </tr>
 <tr class="odd">
-<td align="left">Culinary Arts</td>
-<td align="right">7</td>
-</tr>
-<tr class="even">
-<td align="left">Performing Arts</td>
-<td align="right">69</td>
-</tr>
-<tr class="odd">
-<td align="left">Business</td>
-<td align="right">34</td>
-</tr>
-<tr class="even">
 <td align="left">Environmental Science</td>
 <td align="right">7</td>
 </tr>
+<tr class="even">
+<td align="left">Architecture</td>
+<td align="right">6</td>
+</tr>
 <tr class="odd">
-<td align="left">Zoned</td>
-<td align="right">29</td>
+<td align="left">Performing Arts/Visual Art &amp; Design</td>
+<td align="right">6</td>
+</tr>
+<tr class="even">
+<td align="left">Film/Video</td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">Communications</td>
+<td align="right">22</td>
 </tr>
 </tbody>
 </table>

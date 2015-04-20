@@ -29,6 +29,13 @@ library(plyr)
 library(dplyr)
 ```
 
+## Connecting to MongoDB
+
+```{r}
+mongo <- mongo.create()
+coll <- "test.nyc_data_json"
+```
+
 
 ## Importing the data into MongoDB
 
@@ -71,21 +78,16 @@ colnames(nyc_data) <- colnames
 
 nyc_data_json<-apply(nyc_data,1,function(x) toJSON(x))
 
-write(nyc_data_json,"~/nyc_data_json.json")
+#export to mongo
+apply(nyc_data,1,function(x) {mongo.insert(mongo
+                                                    , coll
+                                                    ,mongo.bson.from.JSON(
+                                                      toJSON(x)
+                                                      )
+                                                    )
+                                       }
+      )
 
-```
-
-The [resulting file](https://raw.githubusercontent.com/rmalarc/is607/5471a74ea8d15aea06a5f7f4039c637411919558/assignment12/nyc_data_json.json) is then imported using mongoimport as follows:
-
-`
-mongoimport ~/nyc_data_json.json 
-`
-
-## Connecting to MongoDB
-
-```{r}
-mongo <- mongo.create()
-coll <- "test.nyc_data_json"
 ```
 
 
