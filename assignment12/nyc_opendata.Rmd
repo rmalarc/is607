@@ -78,6 +78,9 @@ colnames(nyc_data) <- colnames
 
 nyc_data_json<-apply(nyc_data,1,function(x) toJSON(x))
 
+#delete all previously imported entries
+mongo.remove(mongo, coll)
+
 #export to mongo
 apply(nyc_data,1,function(x) {mongo.insert(mongo
                                                     , coll

@@ -133,7 +133,10 @@ colnames(nyc_data) &lt;- colnames
 
 nyc_data_json&lt;-apply(nyc_data,1,function(x) toJSON(x))
 
-#export to mongo
+#delete all previously imported entries
+mongo.remove(mongo, coll)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>#export to mongo
 apply(nyc_data,1,function(x) {mongo.insert(mongo
                                                     , coll
                                                     ,mongo.bson.from.JSON(
