@@ -105,6 +105,7 @@ dxref_data_corpus <- tm_map(dxref_data_corpus, stripWhitespace)
 
 # merge with dataframe
 dxref_data$disease_phrase <- dxref_data_corpus[["1"]][["content"]]
+dxref_data$disease_phrase <- gsub(" "," AND ",dxref_data$disease_phrase)
 dxref_data$url_params <- sapply(dxref_data$disease_phrase,URLencode)
 
 ```
