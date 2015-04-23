@@ -1,7 +1,7 @@
 ---
-title: 'IS607 Final Project: Scraping R-Bloggers'
+title: 'Finding Related Diseases by Scraping Pubmed'
 author: "Mauricio Alarcon"
-date: "April 18, 2015"
+date: "April 23, 2015"
 output: html_document
 ---
 
@@ -11,16 +11,20 @@ When analyzing health data, it is very important to define control groups. The d
 
 Let's say that we want to analyze a set of observations for patients with end stage kidney disease with the goal of establishing an early diagnosis. 
 
-We first want to know what type of observations are more often found in this population. In order to do this analysis, we need a good control group, preferable composed of precursors or populations that may have a high risk for developing the disease of interest.
+We may want to know what type of observations are more often found in this population. In order to do this analysis, we need a good control group, preferable composed of precursors or populations that may be at a high risk for developing the disease of interest.
 
-The purpose of this project is to build a database of diseases and other related diseases by srapping a well-known clinical literature search engine such as [PubMed](http://www.ncbi.nlm.nih.gov/pubmed).
+The purpose of this project is to build a database of diseases and other related diseases by scraping a well-known clinical-literature search engine such as [PubMed](http://www.ncbi.nlm.nih.gov/pubmed).
 
-Let's say D is the set of disease terms such that d is a given disease term. In this case, we will use disease terms found in ICD9 classification data.
+The assumption is that if a publication contains references to conditions A and B, there may be a relationship between these two. If the above it is true for a large number of publications, it may suggest that the disease combination could be a good candidate for further analysis.
+
+We will use disease terms found in ICD9 classification data.
 
 The goal is to obtain frequency counts of:
 * Individual disease terms: Diabetes, Cancer, HIV, etc.
 * All disease terms combinations: Diabetes AND Cancer, Diabetes AND HIV, etc.
 
+
+* * * 
 
 #The Libraries
 
@@ -34,8 +38,9 @@ library(stringr)
 library(rmongodb)
 library(rjson)
 library(tm)
-
 ```
+
+* * * 
 
 #Loading Diesease Phrases
 
@@ -52,10 +57,15 @@ dxref <- "https://raw.githubusercontent.com/rmalarc/is607/master/final_project/S
 dxref_data_csv <- getURL(dxref)
 dxref_data <- read.csv(text=dxref_data_csv,head=TRUE,sep=",",as.is=TRUE)
 
+#clean up column names and turn to lower_case
+colnames(dxref_data)<-tolower(gsub("\\.","_",colnames(dxref_data)))
+
 kable(summary(dxref_data))
 
 kable(head(dxref_data,n=25))
 ```
+
+* * * 
 
 #Preparing the Disease Terms
 
@@ -69,9 +79,9 @@ In order to use the disease terms we need to:
 
 # flag those terms that appear to be invalid
 dxref_data$is_valid <- TRUE
-dxref_data[dxref_data$CCS.DIAGNOSIS.CATEGORIES %in%
+dxref_data[dxref_data$ccs_diagnosis_categories %in%
              c(".Z  ",".   ",".A  ","254","255","256","257","258","259"),"is_valid"] <-FALSE 
-dxref_data[grep("E Codes: ",dxref_data$CCS.DIAGNOSIS.CATEGORIES.LABELS),"is_valid"] <-FALSE 
+dxref_data[grep("E Codes: ",dxref_data$ccs_diagnosis_categories_labels),"is_valid"] <-FALSE 
 
 # gsub helper function
 toString <- content_transformer(function(x, from, to) gsub(from, to, x))
@@ -84,6 +94,9 @@ dxref_data_corpus <- tm_map(dxref_data_corpus, removeNumbers)
 
 # to lowercase
 dxref_data_corpus <- tm_map(dxref_data_corpus, content_transformer(tolower))
+
+# Hyphens to spaces
+dxref_data_corpus <- tm_map(dxref_data_corpus, toString, "-", " ")
 
 # remove the stuff in parentesis
 dxref_data_corpus <- tm_map(dxref_data_corpus, toString, "\\(.+\\)", "")
@@ -110,6 +123,8 @@ dxref_data$url_params <- sapply(dxref_data$disease_phrase,URLencode)
 
 ```
 
+* * * 
+
 #Helper Functions
 
 In order to facilitate scraping more than one page, we will use the following functions:
@@ -123,7 +138,7 @@ In order to facilitate scraping more than one page, we will use the following fu
 ####################################################################################
 
 pubmed_entries_for <-function(URLParams) {
-  Sys.sleep(1)
+  Sys.sleep(0.5)
   baseURL <- "http://www.ncbi.nlm.nih.gov/pubmed?term="
   theURL <- paste(baseURL,URLParams,sep="")
   page_data <- html(theURL)
@@ -152,16 +167,20 @@ pubmed_entries_for <-function(URLParams) {
 # The processed output is saved to MongoDB and returned as a dataframe
 ####################################################################################
 scrape_pubmed_entries <- function(ref_data,entry_type) {
-  #ref_data<-dxref_data
-  #entry_type<-"absolute_count"
+  #ref_data<-dxref_data_x_join
+  #entry_type<-"intersect_count"
   
   coll<-paste(ns,entry_type,sep=".")
-  entries_processed <- NA
+
   # get previously exported records
-  buf <- mongo.bson.buffer.create()
-  mongo.bson.buffer.append(buf, "entry_type", entry_type)
-  mongo_query <- mongo.bson.from.buffer(buf)
-  entries_processed <- mongo.cursor.to.data.frame(mongo.find(m,coll,mongo_query))
+  entries_processed <- NULL
+  cursor<-mongo.find(m
+                     ,coll
+                     ,query = mongo.bson.empty()
+                     ,fields=list(url_params=1L)
+                     )
+  entries_processed <- mongo.cursor.to.data.frame(cursor)
+  mongo.cursor.destroy(cursor)
 
   # process records not already processed
   entries_to_process <- ref_data[!(ref_data$url_params %in% entries_processed$url_params),]
@@ -183,12 +202,18 @@ scrape_pubmed_entries <- function(ref_data,entry_type) {
   }
   
   # get all processed entries
-  entries_processed <- mongo.cursor.to.data.frame(mongo.find(m,coll,mongo_query))
+  cursor <- mongo.find(m
+                       ,coll
+                       ,query = mongo.bson.empty()
+                       )
+  entries_processed <- mongo.cursor.to.data.frame(cursor)
+  mongo.cursor.destroy(cursor)
 
   return(entries_processed)
 }
 ```
 
+* * * 
 
 #Scraping the Pubmed Search Engine
 
@@ -220,20 +245,22 @@ kable(head(absolute_count_entries_processed,n=25))
 
 ```
 
+* * * 
+
 ##Getting Frequency Counts of Disease Term Combinations (ie: tuberculosis AND hiv)
 
 ```{r}
 # x-join all the VALID terms
-dxref_data_x_join <- merge(x = absolute_count_entries_processed[absolute_count_entries_processed$is_valid,]
-                           , y = absolute_count_entries_processed[absolute_count_entries_processed$is_valid,]
+dxref_data_x_join <- merge(x = absolute_count_entries_processed[absolute_count_entries_processed$is_valid&(absolute_count_entries_processed$hits>0),]
+                           , y = absolute_count_entries_processed[absolute_count_entries_processed$is_valid&(absolute_count_entries_processed$hits>0),]
                            , by = NULL)
 
-dxref_data_x_join$CCS.DIAGNOSIS.CATEGORIES.x<-as.character(dxref_data_x_join$CCS.DIAGNOSIS.CATEGORIES.x)
-dxref_data_x_join$CCS.DIAGNOSIS.CATEGORIES.y<-as.character(dxref_data_x_join$CCS.DIAGNOSIS.CATEGORIES.y)
+dxref_data_x_join$ccs_diagnosis_categories.x<-as.character(dxref_data_x_join$ccs_diagnosis_categories.x)
+dxref_data_x_join$ccs_diagnosis_categories.y<-as.character(dxref_data_x_join$ccs_diagnosis_categories.y)
 
 #Remove permutations, we just want combinations
-dxref_data_x_join <- dxref_data_x_join[dxref_data_x_join$CCS.DIAGNOSIS.CATEGORIES.x
-                                       >dxref_data_x_join$CCS.DIAGNOSIS.CATEGORIES.y,]
+dxref_data_x_join <- dxref_data_x_join[dxref_data_x_join$ccs_diagnosis_categories.x
+                                       >dxref_data_x_join$ccs_diagnosis_categories.y,]
 
 # generate combined URL parameters
 dxref_data_x_join$url_params <- sprintf("(%s)AND(%s)",dxref_data_x_join$url_params.x,dxref_data_x_join$url_params.y)
@@ -246,10 +273,61 @@ kable(head(intersect_count_entries_processed,n=25))
 
 ```
 
-## The output
+* * * 
+
+#Individual Disease Terms Sorted by Absolute Frequency
 
 ```{r}
+# Estimate the total number of UNIQUE documents
+total_number_of_documents<-sum(absolute_count_entries_processed$hits)*0.5
 
-#kable(blog_posts_df[c("title","author","date","url","page")])
+
+absolute_count_entries_processed$p_hit <- absolute_count_entries_processed$hits/total_number_of_documents
+
+kable(
+  absolute_count_entries_processed[
+    order(-absolute_count_entries_processed$p_hit)
+    ,c("ccs_diagnosis_categories_labels"
+       ,"hits"
+       ,"p_hit"
+      )
+    ]
+)
+
+```
+
+* * * 
+
+#Top-500 Disease Term Combinations Sorted by Absolute Frequency
+
+```{r}
+summary<-intersect_count_entries_processed[c("ccs_diagnosis_categories_labels.x"
+                                             ,"ccs_diagnosis_categories_labels.y"
+                                             ,"url_params"
+                                             ,"hits.x"
+                                             ,"hits.y"
+                                             ,"hits")]
+
+summary$p_intersect_given_xy<-summary$hits/(summary$hits.x+summary$hits.y)
+
+
+summary$p_intersect<-summary$hits/total_number_of_documents
+
+kable(
+  head(
+    summary[
+      order(-summary$p_intersect)
+      ,c("ccs_diagnosis_categories_labels.x"
+         ,"ccs_diagnosis_categories_labels.y"
+         ,"hits.x"
+         ,"hits.y"
+         ,"hits"
+         ,"p_intersect_given_xy"
+         ,"p_intersect"
+         )
+      ]
+    ,n=500
+    )
+  )
 
 ```
