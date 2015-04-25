@@ -237,11 +237,11 @@ if (restart){
   mongo.remove(m, ns) 
 }
 
-absolute_count_entries_processed <- scrape_pubmed_entries(dxref_data,"absolute_count")
+absolute_count_entries_processed <- scrape_pubmed_entries(dxref_data[dxref_data$is_valid,],"absolute_count")
 
 
 # show a sample of the output
-kable(head(absolute_count_entries_processed,n=25))
+#kable(head(absolute_count_entries_processed,n=25))
 
 ```
 
@@ -269,7 +269,7 @@ dxref_data_x_join$url_params <- sprintf("(%s)AND(%s)",dxref_data_x_join$url_para
 intersect_count_entries_processed <- scrape_pubmed_entries(dxref_data_x_join,"intersect_count")
 
 #show a sample of the output
-kable(head(intersect_count_entries_processed,n=25))
+#kable(head(intersect_count_entries_processed,n=25))
 
 ```
 
@@ -279,7 +279,7 @@ kable(head(intersect_count_entries_processed,n=25))
 
 ```{r}
 # Estimate the total number of UNIQUE documents
-total_number_of_documents<-sum(absolute_count_entries_processed$hits)*0.5
+total_number_of_documents<-sum(absolute_count_entries_processed[absolute_count_entries_processed$is_valid,"hits"])*0.5
 
 
 absolute_count_entries_processed$p_hit <- absolute_count_entries_processed$hits/total_number_of_documents
