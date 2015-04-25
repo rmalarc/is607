@@ -1,0 +1,312 @@
+---
+title: 'Analyze Your Flickr Photostream Before You Buy a Lens'
+author: "Mauricio Alarcon"
+date: "April 21, 2015"
+output: html_document
+---
+  
+##Summary
+  
+Here's how it started. I'm looking at buying a new lens for my camera. In addition to being expensive, lenses come in a wide variety configurations. I wanna make sure I get a lens that fits my needs. 
+
+One of the main considerations when buying a lens is the focal length and speed, which heavily depend on the type of photography you do. I feel I can use some data to help assess my needs.
+
+Modern cameras embed a lot of data in each shot. This includes: camera make and model, aperture, flash settings, etc. This information is stored as [Exchangeable Image File Format - EXIF](http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/EXIF.html) attributes.
+
+The goal of this project is to scrape these attributes from my [Flickr Photostream](https://www.flickr.com/photos/10904202@N07/) using the [Flickr API](https://www.flickr.com/services/api/)
+  
+***
+
+##The Libraries
+
+```{r, warning=FALSE, message=FALSE}
+library(RCurl)
+library(knitr)
+library(rmongodb)
+library(XML)
+library(lattice)
+library(ggplot2)
+
+# Flickr API Key --- GET YOUR OWN
+api_key <- "GET_YOUR_OWN_KEY_AT_FLICKR_DOT_COM"
+baseURL <- paste("https://api.flickr.com/services/rest/?&format=rest&api_key=",api_key,sep="")
+# we're using Mongo to store the results
+m <- mongo.create()
+ns <- "flickr"
+
+```
+
+```{r echo=FALSE}
+# Flickr API Key --- GET YOUR OWN
+api_key <- "6c6dd5d7594057dc1ee21dafd19000b7"
+baseURL <- paste("https://api.flickr.com/services/rest/?&format=rest&api_key=",api_key,sep="")
+```
+
+***
+
+##Finding my Flickr UserID
+
+All I know is my username. Here, we will use Flickr's API findByUsername method in order to obtain my UserID
+
+
+```{r}
+
+#
+# Use findByUsername: https://www.flickr.com/services/api/explore/flickr.people.findByUsername
+#
+
+# Flickr username
+user_name <- "rmalarc"
+
+# Getting the userID
+findByUsername <- paste(baseURL,"&method=flickr.people.findByUsername&username=",user_name,sep="")
+
+findByUsername_data <- xmlRoot(xmlParse(getURL(findByUsername)))
+user_id <- xmlSApply(findByUsername_data,xmlAttrs)["id",]
+
+(user_id)
+```
+
+***
+
+##Get All My Public Photos
+
+In this step we will get all my public photos by using the getPublicPhotos method. The list of photos is stored in a data frame.
+
+```{r}
+#
+# Use getPublicPhotos: https://www.flickr.com/services/api/flickr.people.getPublicPhotos.html
+#
+getPublicPhotos <- paste(baseURL
+                         ,"&method=flickr.people.getPublicPhotos&per_page=1000&user_id="
+                         ,user_id
+                         ,sep="")
+
+getPublicPhotos_data <- xmlRoot(xmlParse(getURL(getPublicPhotos)))
+
+#parse the total number of pages
+pages_data <- data.frame(xmlAttrs(getPublicPhotos_data[["photos"]]))
+pages_data[] <- lapply(pages_data, as.character)
+pages_data[] <- lapply(pages_data, as.integer)
+colnames(pages_data)<- "value"
+total_pages <- pages_data["pages","value"] 
+
+photos_for_user<-NULL
+
+# loop thru pages of photos and save the list in a DF
+for(i in c(1:total_pages)){
+  getPublicPhotos_data <- xmlRoot(xmlParse(getURL(getPublicPhotos)))
+  tmp_df<-data.frame(t(data.frame(xmlSApply(getPublicPhotos_data[["photos"]],xmlAttrs))),stringsAsFactors=FALSE)
+  tmp_df$page <- i
+  photos_for_user<-rbind(photos_for_user,tmp_df)
+
+  # get the next page
+  getPublicPhotos <- paste(baseURL
+                           ,"&method=flickr.people.getPublicPhotos&per_page=1000&user_id="
+                           ,user_id,"&page="
+                           ,i+1,sep="")  
+  getPublicPhotos_data <- xmlRoot(xmlParse(getURL(getPublicPhotos)))
+  
+}
+
+kable(head(photos_for_user))
+
+```
+
+***
+
+##Select the Photos to Process
+
+The purpose of this script is to process new photos from my photo stream. Previous data is stored in MongoDB. Here, we will select photos not yet processed.
+
+```{r}
+# get previously processed photos
+entry_type <- "photos_exif"
+coll<-paste(ns,entry_type,sep=".")
+
+entries_processed <- NULL
+cursor<-mongo.find(m
+                    ,coll
+                    ,query = mongo.bson.empty()
+                    ,fields=list(photo_id=1L)
+                    )
+entries_processed <- mongo.cursor.to.data.frame(cursor,stringsAsFactors=FALSE)
+mongo.cursor.destroy(cursor)
+
+# process records not already processed
+entries_to_process <- photos_for_user[!(photos_for_user$id %in% entries_processed$photo_id),]
+
+
+kable(head(entries_to_process))
+
+```
+
+***
+
+##Get Exif Photo Attributes
+
+Now it's time to get those Exif attributes for my pictures. We will use the getExif method from the Flicker API. Results are stored into MongoDB.
+
+```{r}
+#
+# Use getExif: https://www.flickr.com/services/api/flickr.photos.getExif.html
+#
+
+photos_exif <-NULL
+for(photo_id in entries_to_process$id){
+  Sys.sleep(0.5)
+
+  #photo_id<-photos_for_user$id[1]
+  getExif <- paste(baseURL,"&method=flickr.photos.getExif&photo_id=",photo_id,sep="")
+  getExif_data <- xmlRoot(xmlParse(getURL(getExif)))
+  
+  # get the exif attribute name 
+  tmp_df<-data.frame(xmlSApply(getExif_data[["photo"]],xmlAttrs),stringsAsFactors=FALSE)
+  colnames(tmp_df)<-tmp_df["tag",]
+  
+  # get the exif attribute raw values
+  tmp_df_val<-data.frame(t(data.frame(xmlSApply(getExif_data[["photo"]],xmlValue))),stringsAsFactors=FALSE)
+  
+  # name the column after the attribute name
+  colnames(tmp_df_val)<-tmp_df["tag",]
+
+  # add a photo_id column and rowname
+  tmp_df_val$photo_id <- photo_id
+  row.names(tmp_df_val)<-photo_id
+  colnames(photos_exif)
+  
+  # export to mongo
+  mongo.insert(m, coll,mongo.bson.from.JSON(toJSON(tmp_df_val)))
+#  photos_exif<-rbind.fill(photos_exif,tmp_df_val)
+}
+
+```
+
+***
+
+##Load Processed Photo Attributes
+
+In this step, we will load all previously loaded data.
+
+```{r}
+
+photos_exif <- NULL
+cursor<-mongo.find(m
+                    ,coll
+                    ,query = mongo.bson.empty()
+                    )
+photos_exif <- mongo.cursor.to.data.frame(cursor)
+mongo.cursor.destroy(cursor)
+
+kable(head(photos_exif))
+
+#photos_exif_old <-photos_exif
+#apply(photos_for_user,1,function(results){
+#  mongo.insert(m, coll,mongo.bson.from.JSON(toJSON(results)))})
+
+
+```
+
+***
+
+##Cleaning Up the Data
+
+```{r}
+attr<-photos_exif[photos_exif$Model == "NIKON D3100"
+                  ,c("photo_id"
+                    ,"Model"
+                    ,"Lens"
+                    ,"FocalLength"
+                    ,"FNumber"
+                    ,"MaxApertureValue"
+                    ,"ISO"
+                    ,"ExposureTime"
+                    ,"GainControl"
+                    ,"Flash"
+                    ,"LightSource"
+                    ,"DateTimeOriginal")]
+
+
+attr$Lens[grep("18-270mm",attr$Lens)] <- "18-270mm f/3.5-6.3"
+attr$Lens[grep("18\\.0-270\\.0",attr$Lens)] <- "18-270mm f/3.5-6.3"
+attr$Lens[grep("18\\.0-55\\.0",attr$Lens)] <- "18-55mm f/3.5-5.6"
+attr$Lens[grep("55\\.0-200\\.0",attr$Lens)] <- "55-200mm f/4-5.6"
+attr$Lens<-as.character(attr$Lens)
+attr$ExposureTime<-as.character(attr$ExposureTime)
+
+
+attr$FocalLength_clean <- as.numeric(gsub("^\\d+\\.\\d+ +mm(.+) +mm","\\1",attr$FocalLength,fixed = FALSE ))
+attr$FNumber_clean <- as.numeric(gsub("^.+\\/(.+)","\\1",attr$FNumber,fixed = FALSE ))
+attr$ExposureTime_clean <- as.integer(gsub(".*\\/([0-9]+)\\)$","\\1",attr$ExposureTime))
+
+
+attr$FocalLength_disc <- cut(attr$FocalLength_clean, breaks = c(0,25, 50, 75, 100,150, 300))
+
+```
+
+*** 
+
+##Analysing the Data
+
+###Lens Utilization
+
+```{r}
+
+p <- qplot(Lens, data=attr, geom="bar", fill=Lens)
+p + labs(title = "Volume of Pictures by Lens Type")
+
+```
+
+As we can see, I definitely use my prime lens a lot more than the others, even the fancy 18-270mm zoom lens.
+
+###Focal Length Utilization
+
+```{r}
+
+histogram(~FocalLength_clean, data = attr,
+          main="Distribution of Focal Length",
+          xlab="Focal Length (mm)")
+
+fl_freq<-data.frame(table(attr$FocalLength_disc)/sum(table(attr$FocalLength_disc)))
+colnames(fl_freq)<-c("Focal Length","Frequency")
+kable(fl_freq)
+```
+
+As we can see above, over 85% of my pictures are taken at less than 50mm.
+
+```{r}
+
+histogram(~FocalLength_clean | Lens, data = attr,
+          main="Distribution of Focal Length by Lens Type",
+          xlab="Focal Length (mm)")
+
+```
+
+In the above plot, we can see that I don't even use high-zoom levels even with my bigger lenses.
+
+###f-Number and Exposure Time Analysis
+
+```{r}
+
+xyplot(FocalLength_clean~FNumber_clean|Lens, data=attr,
+   main = "Focal Length vs f-Number by Lens Type",
+   xlab = "f-Number", ylab = "Focal Length (mm)")
+
+
+histogram(~FNumber_clean | Lens, data = attr,
+          main="Distribution of f-Number by Lens Type",
+          xlab="f-Number")
+
+xyplot(ExposureTime_clean~FNumber_clean|Lens, data=attr,
+   main = "Exposure Time vs f-Number by Lens Type",
+   xlab = "f-Number", ylab = "Exposure Time (1/DEN)")
+
+```
+
+As we can see from the charts above, I tend to shoot my pictures on with a low f-number, regardless of the lens and exposure time. 
+
+* * *
+
+##Conclusion
+
+Based on my photographic history, there's no need to go for a big zoom lens. I should be fine if I choose a lens that goes up to 100mm. Instead, I should focus on a lens that offers the lowest f-number.
