@@ -146,3 +146,45 @@ MATCH (a:Student)
 CREATE (a) -[r:Housed {room:b.Room
                         }]-> (c);
 
+
+/////////////////////////////////
+// QUERIES
+
+//Who are the roommates of Richard Kowalski
+
+MATCH (rich_kowalski:Student { firstname:'Richard',lastname:'Kowalski' })
+      -[r1:Housed]->
+          (richs_dorm:Dormitory)
+              <-[r2:Housed]-
+                (dorm_mates:Student)
+RETURN rich_kowalski,richs_dorm,dorm_mates;
+
+
+//Richard Kowalski finishes a class
+
+//Create the Complete relationship
+
+MATCH (rich_kowalski:Student { firstname:'Richard',lastname:'Kowalski' })
+      -[r1:Enrolled {section:"12136"
+                    ,grade:"IP"}]->
+            (class:Course {number:"120"
+                          ,title:"Finite Mathematics"
+                        }
+            )
+CREATE (rich_kowalski) -[r:Completed {section:r1.section
+                          ,instructor:r1.instructor
+                          , grade:"B"
+                        }]-> (class);
+
+
+//Delete the Enrolled relationship
+
+MATCH (rich_kowalski:Student { firstname:'Richard',lastname:'Kowalski' })
+      -[r1:Enrolled {section:"12136"
+                    ,grade:"IP"}]->
+            (class:Course {number:"120"
+                          ,title:"Finite Mathematics"
+                        }
+            )
+DELETE r1;
+
