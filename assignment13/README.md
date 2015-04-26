@@ -41,7 +41,7 @@ This script attempts to solve this part of the assginment by:
 * Process the nodes based upon the previously loaded data
 * Process the relationships
 
-The entire script is available (here)[https://raw.githubusercontent.com/rmalarc/is607/master/assignment13/week_14.cypher]. It can be executed from the
+The entire script is available [here](https://raw.githubusercontent.com/rmalarc/is607/master/assignment13/week_14.cypher). It can be executed from the
 
 ```
 wget https://raw.githubusercontent.com/rmalarc/is607/master/assignment13/week_14.cypher
