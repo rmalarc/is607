@@ -1,0 +1,429 @@
+---
+title: 'Project 5: Using Neo4J to Represent Related Diseases from PubMed-Scrapped Data'
+author: "Mauricio Alarcon"
+date: "May 1, 2015"
+output: html_document
+---
+
+#Summary
+
+The purpose of this project is to build a graph database of diseases and other related diseases by scraping a well-known clinical-literature search engine such as [PubMed](http://www.ncbi.nlm.nih.gov/pubmed).
+
+The assumption is that if a publication contains references to conditions A and B, there may be a relationship between these two. If the above it is true for a large number of publications, it may suggest that the disease combination could be a good candidate for further analysis.
+
+We will use disease terms found in ICD9 classification data.
+
+The goal is to obtain frequency counts of:
+* Individual disease terms: Diabetes, Cancer, HIV, etc.
+* All disease terms combinations: Diabetes AND Cancer, Diabetes AND HIV, etc.
+
+
+* * * 
+
+#The Libraries
+
+```{r, warning=FALSE, message=FALSE}
+library(RCurl)
+library(XML)
+library(rvest)
+library(knitr)
+library(plyr)
+library(stringr)
+library(rmongodb)
+library(rjson)
+library(tm)
+```
+
+* * * 
+
+#Loading Diesease Phrases
+
+The Healthcare Utilization Project (HCUP) has an ICD9 classification data available in [their website](https://www.hcup-us.ahrq.gov/toolssoftware/ccs/ccs.jsp).
+
+There is one file in particular that contains diagnosis category names. This list is great as the disease labels are in [plain english](https://www.hcup-us.ahrq.gov/toolssoftware/ccs/CCSCategoryNames_FullLabels.pdf). 
+
+A CSV version of this file is available in the [Single-Level Diagnosis CCS Categories](https://www.hcup-us.ahrq.gov/toolssoftware/ccs/Single_Level_CCS_2015.zip). This is the data that we will use as our list of diseases.
+
+
+```{r}
+# get files diagnosis category label from CSV in github
+dxref <- "https://raw.githubusercontent.com/rmalarc/is607/master/final_project/Single_Level_CCS_2015/dxlabel%202013.csv"
+dxref_data_csv <- getURL(dxref)
+dxref_data <- read.csv(text=dxref_data_csv,head=TRUE,sep=",",as.is=TRUE)
+
+#clean up column names and turn to lower_case
+colnames(dxref_data)<-tolower(gsub("\\.","_",colnames(dxref_data)))
+
+kable(summary(dxref_data))
+
+kable(head(dxref_data,n=25))
+```
+
+* * * 
+
+#Preparing the Disease Terms
+
+In order to use the disease terms we need to:
+
+* Clean up strings (remove numbers, punctuation, convert to lower-case)
+* Remove stop words
+* URL Encode the phrases
+
+```{r}
+
+# flag those terms that appear to be invalid
+dxref_data$is_valid <- TRUE
+dxref_data[dxref_data$ccs_diagnosis_categories %in%
+             c(".Z  ",".   ",".A  ","254","255","256","257","258","259","41"),"is_valid"] <-FALSE 
+dxref_data[grep("E Codes: ",dxref_data$ccs_diagnosis_categories_labels),"is_valid"] <-FALSE 
+
+# gsub helper function
+toString <- content_transformer(function(x, from, to) gsub(from, to, x))
+
+#load data into corpus
+dxref_data_corpus <- Corpus(VectorSource(dxref_data[2]))
+
+#remove numbers
+dxref_data_corpus <- tm_map(dxref_data_corpus, removeNumbers)
+
+# to lowercase
+dxref_data_corpus <- tm_map(dxref_data_corpus, content_transformer(tolower))
+
+# Hyphens to spaces
+dxref_data_corpus <- tm_map(dxref_data_corpus, toString, "-", " ")
+
+# remove the stuff in parentesis
+dxref_data_corpus <- tm_map(dxref_data_corpus, toString, "\\(.+\\)", "")
+
+# replace / or - for whitespace
+dxref_data_corpus <- tm_map(dxref_data_corpus, toString, "(/|-)", " ")
+
+#remove punctuation
+dxref_data_corpus <- tm_map(dxref_data_corpus, removePunctuation)
+
+
+# remove english stop words
+dxref_data_corpus <- tm_map(dxref_data_corpus, removeWords, stopwords("english"))
+
+# remove english stop words
+dxref_data_corpus <- tm_map(dxref_data_corpus, removeWords, c("unspecified","site","primary"))
+
+# strip double white spaces
+dxref_data_corpus <- tm_map(dxref_data_corpus, toString, "^\\s+|\\s+$", "")
+dxref_data_corpus <- tm_map(dxref_data_corpus, toString, "  ", " ")
+dxref_data_corpus <- tm_map(dxref_data_corpus, stripWhitespace)
+
+# merge with dataframe
+dxref_data$disease_phrase <- dxref_data_corpus[["1"]][["content"]]
+dxref_data$disease_phrase <- gsub(" "," AND ",dxref_data$disease_phrase)
+dxref_data$url_params <- sapply(dxref_data$disease_phrase,URLencode)
+
+```
+
+* * * 
+
+#Helper Functions
+
+In order to facilitate scraping more than one page, we will use the following functions:
+
+```{r}
+####################################################################################
+# pubmed_entries_for(URLParams)
+#
+# This function scrapes pubmed by searching for the specified URL encoded keyword.
+# The function returns the number of entries in pubmed for the keyword.
+####################################################################################
+
+pubmed_esearch_entry <-function(URLParams) {
+  #URLParams <- "sexually%20AND%20transmitted%20AND%20infections"
+  Sys.sleep(0.2)
+  baseURL <- "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmax=500000&retmode=xml&term="
+  theURL <- paste(baseURL,URLParams,sep="")
+  page_data <- xmlParse(theURL)
+
+  # get the number of pubmed hits
+  Count<- page_data %>% 
+              xml_nodes("eSearchResult") %>%
+              xml_node("Count")
+  Count<-as.integer(sapply(Count,xmlValue))
+  
+  # get the number of pubmed hits
+  RetMax<- page_data %>% 
+              xml_nodes("eSearchResult") %>%
+              xml_node("RetMax")
+  RetMax<-as.integer(sapply(RetMax,xmlValue))
+
+  
+#  list<-xmlToList(page_data)
+
+  IdList<- page_data %>% 
+              xml_nodes("eSearchResult") %>%
+              xml_node("IdList") %>%
+              xml_nodes("Id")
+  IdList<- data.frame(as.integer(sapply(IdList,xmlValue)))
+  colnames(IdList) = "Id"
+
+
+  retval <- list(url_params=URLParams
+                 ,Count=Count
+                ,RetMax=RetMax
+                 ,IdList=IdList)
+  return(retval)
+}
+
+####################################################################################
+# pubmed_esearch_entries(ref_data, entry_type)
+#
+# This function accepts a dataframe containing the entries to process as well as an entry_type.
+# The DF must contain a column called url_params, which are the URL parameters passed to
+# pubmed_entries_for.
+# 
+# The processed output is saved to MongoDB and returned as a dataframe.
+# Two CSV files are generated as well:
+#     * [entry_type]_entry.csv: Contains the entry provided in ref_data plust the number 
+#        of pubmed hits
+#     * [entry_type]_entry_docs.csv: Contains all document ids for each of the keywords in
+#       ref_data
+####################################################################################
+pubmed_esearch_entries <- function(ref_data,entry_type) {
+  #ref_data<-dxref_data_x_join
+  #entry_type<-"intersect_count"
+  # BASE PATH
+  base_path <-"/Users/malarcon/Google Drive/CUNY/IS607/submissions/project5/"
+
+  coll<-paste(ns,entry_type,sep=".")
+
+  # get previously exported records
+  entries_processed <- NULL
+  cursor<-mongo.find(m
+                     ,coll
+                     ,query = mongo.bson.empty()
+                     ,fields=list(url_params=1L)
+                     )
+  entries_processed <- mongo.cursor.to.data.frame(cursor)
+  mongo.cursor.destroy(cursor)
+
+  # process records not already processed
+  entries_to_process <- ref_data[!(ref_data$url_params %in% entries_processed$url_params),]
+
+  if(nrow(entries_to_process)>0){
+    for (i in 1:nrow(entries_to_process)){
+      #i<-1
+      entry<-entries_to_process[i,]
+      # get the number of hits for entry in pubmed
+      esearch<-pubmed_esearch_entry(entry$url_params)
+
+      # resulting DF
+      results<-split(entry[1,], "Query")
+      results$entry_type <- entry_type
+      results$esearch<-esearch
+
+      # export keyword details to CSV
+      entry <- data.frame(entry,Count=esearch$Count)
+      entry_columns <- colnames(entry)
+      write.table(entry
+                ,file=paste(base_path,entry_type,"_entry.csv",sep="")
+                ,append=TRUE
+                ,row.names=FALSE
+                ,col.names=FALSE
+                , sep = ","
+                )
+      
+      # Write doclist to _entry.csv 
+      if (esearch$Count >0 ){
+        # export document list to CSV
+        entry_docs<-data.frame(url_params=entry$url_params,results$esearch$IdList)
+        entry_docs_columns <- colnames(entry_docs)      
+        write.table(entry_docs
+                ,file=paste(base_path,entry_type,"_entry_docs.csv",sep="")
+                ,append=TRUE
+                ,row.names=FALSE
+                ,col.names=FALSE
+                ,sep = ","
+                )
+      }
+      # export to mongo
+      mongo.insert(m, coll,mongo.bson.from.JSON(toJSON(esearch)))
+    }
+    # export header names
+    entry_docs_columns <- paste(colnames(entry_docs),collapse=",")      
+    write.table(entry_docs_columns
+                ,file=paste(base_path,entry_type,"_entry_docs_columns.csv",sep="")
+                ,append=TRUE
+                ,row.names=FALSE
+                ,col.names=FALSE
+                , sep = ","
+                )
+
+    entry_columns <- paste(colnames(entry),collapse=",")    
+    write.table(entry_columns
+                ,file=paste(base_path,entry_type,"_entry_columns.csv",sep="")
+                ,append=TRUE
+                ,row.names=FALSE
+                ,col.names=FALSE
+                , sep = ","
+                )
+  }
+  
+  # get all processed entries
+  cursor <- mongo.find(m
+                       ,coll
+                       ,query = mongo.bson.empty()
+                       ,fields=list(url_params=1L,
+                                    Count=1L,
+                                    RetMax=1L)
+                       )
+  entries_processed <- mongo.cursor.to.data.frame(cursor)
+  mongo.cursor.destroy(cursor)
+
+  return(entries_processed)
+}
+```
+
+
+* * * 
+
+#Scraping the Pubmed Search Engine - Getting Frequency Counts of Individual Disease Terms
+
+```{r}
+
+# connect to monogo so we can export the results of the scrape a row at a time
+m <- mongo.create()
+ns <- "esearch_pubmed"
+
+
+# yes, it's a loop. The apply functions are faster. However, the function gets delayed by a sec
+# each time. The loop allows me to restart where I left off
+entries_processed <- NULL
+
+# If you want to restart the whole process from scratch, set restart to TRUE
+restart <- FALSE
+if (restart){
+  #delete all previously processed entries by purging the contents of the MongoDB
+  mongo.remove(m, ns) 
+}
+
+absolute_count_entries_processed <- pubmed_esearch_entries(dxref_data[dxref_data$is_valid,],"absolute_count")
+
+
+# show a sample of the output
+#kable(head(absolute_count_entries_processed,n=25))
+
+```
+
+* * * 
+
+#Loading the Output into Neo4J
+
+This is easier said than done. A [cypher query](https://raw.githubusercontent.com/rmalarc/is607/master/project5/pubmed_to_neo4j.cypher) was written in order to load the CSVs generated in the previous step by using the LOAD CSV WITH cypher command.
+
+After much query tweaking I was only able to load the smaller files. Server crashes and out of memory errors were the main issue I found when trying to load the larger file in this fashion. I found several references alluding to server configuration tweaks and other tricks in order to handle larger files.
+
+In my case however, ```absolute_count_entry_docs.csv``` contains 8.6M records and is 351Mb in size. I was unable to load it using the LOAD CSV WITH cypher method. I resorted to the [neo4j-import tool](http://neo4j.com/docs/stable/import-tool-basic-example.html) which proved to be an effective method for large files.
+
+The sequence of commands that load the data into a "new" database are:
+
+```
+
+rm -r pubmed_db
+
+neo4j-import --nodes pubmed_docs_columns.csv,pubmed_docs2.csv \
+            --nodes absolute_count_entry_columns.csv,absolute_count_entry2.csv \
+            --relationships absolute_count_entry_docs_columns.csv,absolute_count_entry_docs2.csv \
+            --into pubmed_db
+
+```
+
+It is important to note that the above command creates a brand new database in the specified **--into pubmed_db** directory. The contents of this directory must be manually copied over to the main MongoDB database directory.
+
+
+* * *
+
+#Using the Data in a Graph
+
+##Items Related to a Single Diagnosis
+
+![disease_relationships_sample](https://raw.githubusercontent.com/rmalarc/is607/master/project5/disease_relationships_sample.png "Neo4J Output")
+
+The above output represents a query for the diagnosis category **Coma; stupor; and brain damage**
+
+As we can see from the graph, we can see other potentially related diagnosis as they are also mentioned in the same PubMed documents.
+
+##Most Frequently Published Diagnosis (Top 20)
+
+```
+MATCH ()-[r:MENTIONS]->(a) 
+RETURN a.category_description , count(*) AS frequency 
+ORDER BY frequency DESC 
+LIMIT 20
+
+```
+
+![top_20_single](https://raw.githubusercontent.com/rmalarc/is607/master/project5/top_20_single.png "Top 20 - Single")
+
+
+##Most Frequently Published Pair-wise Diangosis Combinations (Top 20)
+
+```
+
+MATCH (a)<-[r:MENTIONS]-()-[r1:MENTIONS]->(b) 
+RETURN a.category_description , b.category_description, count(*) AS frequency 
+ORDER BY frequency DESC 
+LIMIT 20
+
+```
+
+![top_20_pairs](https://raw.githubusercontent.com/rmalarc/is607/master/project5/top_20_pairs.png "Top 20 - Pairs")
+
+
+##Create Inter-Diagnosis Relationships
+
+```
+
+CREATE INDEX ON :diagnosis_category(category_id);
+CREATE INDEX ON :pubmed_docs(pubmed_id);
+
+
+MATCH (a)<-[r:MENTIONS]-()-[r1:MENTIONS]->(b) 
+WITH a
+    ,b
+    , TOFLOAT(a.frequency + b.frequency) AS total_frequency
+    , TOFLOAT(count(*)) AS frequency 
+CREATE UNIQUE (a)
+                -[:RELATED {mentions:frequency
+                            ,mentions_probability: frequency/(total_frequency-frequency)}]-
+                (b);
+                
+```
+
+The goal of the above piece of code is to create a relationship called RELATED. Let's say that we have papers that mention the diagnostic terms: Cancer of Uterus and Cancer of Cervix. That's what the RELATED relationship is based on. Note how the relationship is quantified by using the frequency and the probability of that relationship ocurring based on the total number of documents.
+
+
+## Get Top-20 Most Related Diagnosis
+
+```
+MATCH (a)-[r:RELATED]->(b) 
+WHERE r.mentions_probability > 0.1 
+RETURN a.category_description,b.category_description,r.mentions_probability 
+ORDER BY r.mentions_probability  DESC 
+LIMIT 20
+```
+
+![related_conditions_top_20](https://raw.githubusercontent.com/rmalarc/is607/master/project5/related_conditions_top_20.png "Top 20 Related Conditions")
+
+
+## Get Diagnosis Related by at least 10%
+
+```
+
+CREATE INDEX ON :RELATED(mentions_probability);
+
+MATCH ()-[r:RELATED]->() 
+WHERE r.mentions_probability > 0.1 
+RETURN r
+
+```
+
+![related_conditions_graph](https://raw.githubusercontent.com/rmalarc/is607/master/project5/related_conditions_graph.png "Related Conditions Graph")
+
+This one I really like and is the whole point of the project. Notice how the graph suggests that there may be a relationship between HIV, Viral Infection, Hepatitis and Liver diseases (which is true).
