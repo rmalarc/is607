@@ -378,6 +378,13 @@ LIMIT 20
 
 ##Create Inter-Diagnosis Relationships
 
+The goal here is to create a relationship called RELATED. Let's say that we have papers that mention the diagnostic terms: Cancer of Uterus and Cancer of Cervix. That's what the RELATED relationship is based on. Note how the relationship is quantified by using the frequency and the probability of that relationship ocurring based on the total number of documents.
+
+I have two basic rules for defining a relationship:
+
+* Given any two diagnosis a and b, a is related to b if the frequency of a is greater than the frequency of b
+* The frequency count of the relationship ab must be representative. For practical purposes, I'm assuming that any value greater than 200 is statistically representative.
+
 ```
 
 CREATE INDEX ON :diagnosis_category(category_id);
@@ -389,14 +396,13 @@ WITH a
     ,b
     , TOFLOAT(a.frequency + b.frequency) AS total_frequency
     , TOFLOAT(count(*)) AS frequency 
-CREATE UNIQUE (a)
+WHERE a.frequency > b.frequency AND frequency > 200
+CREATE (a)
                 -[:RELATED {mentions:frequency
-                            ,mentions_probability: frequency/(total_frequency-frequency)}]-
+                            ,mentions_probability: frequency/(total_frequency-frequency)}]->
                 (b);
                 
 ```
-
-The goal of the above piece of code is to create a relationship called RELATED. Let's say that we have papers that mention the diagnostic terms: Cancer of Uterus and Cancer of Cervix. That's what the RELATED relationship is based on. Note how the relationship is quantified by using the frequency and the probability of that relationship ocurring based on the total number of documents.
 
 
 ## Get Top-20 Most Related Diagnosis
