@@ -158,3 +158,13 @@ node.pubmed_docs {
   text-color-internal: #FFFFFF;
   caption: '';
 }
+
+relationship.RELATED {
+  color: #A5ABB6;
+  shaft-width: 1px;
+  font-size: 8px;
+  padding: 3px;
+  text-color-external: #000000;
+  text-color-internal: #FFFFFF;
+  caption: '{mentions_probability}';
+}
