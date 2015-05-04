@@ -1,7 +1,7 @@
 ---
 title: 'Project 5: Using Neo4J to Represent Related Diseases from PubMed-Scrapped Data'
 author: "Mauricio Alarcon"
-date: "May 1, 2015"
+date: "May 3, 2015"
 output: html_document
 ---
 
@@ -382,7 +382,7 @@ The goal here is to create a relationship called RELATED. Let's say that we have
 
 I have two basic rules for defining a relationship:
 
-* Given any two diagnosis a and b, a is related to b if the frequency of a is greater than the frequency of b
+* Given any two diagnosis a and b, there are two relationships, A given B and B given A. The two probabilities are calculated, P(A|B) and P(B|A).
 * The frequency count of the relationship ab must be representative. For practical purposes, I'm assuming that any value greater than 200 is statistically representative.
 
 ```
@@ -394,12 +394,11 @@ CREATE INDEX ON :pubmed_docs(pubmed_id);
 MATCH (a)<-[r:MENTIONS]-()-[r1:MENTIONS]->(b) 
 WITH a
     ,b
-    , TOFLOAT(a.frequency + b.frequency) AS total_frequency
     , TOFLOAT(count(*)) AS frequency 
-WHERE a.frequency > b.frequency AND frequency > 200
+WHERE frequency > 200
 CREATE (a)
                 -[:RELATED {mentions:frequency
-                            ,mentions_probability: frequency/(total_frequency-frequency)}]->
+                            ,mentions_probability: frequency/a.frequency}]->
                 (b);
                 
 ```
@@ -418,14 +417,14 @@ LIMIT 20
 ![related_conditions_top_20](https://raw.githubusercontent.com/rmalarc/is607/master/project5/related_conditions_top_20.png "Top 20 Related Conditions")
 
 
-## Get Diagnosis Related by at least 10%
+## Get Diagnosis Related by at least 20%
 
 ```
 
 CREATE INDEX ON :RELATED(mentions_probability);
 
 MATCH ()-[r:RELATED]->() 
-WHERE r.mentions_probability > 0.1 
+WHERE r.mentions_probability > 0.2 
 RETURN r
 
 ```
@@ -433,3 +432,16 @@ RETURN r
 ![related_conditions_graph](https://raw.githubusercontent.com/rmalarc/is607/master/project5/related_conditions_graph.png "Related Conditions Graph")
 
 This one I really like and is the whole point of the project. Notice how the graph suggests that there may be a relationship between HIV, Viral Infection, Hepatitis and Liver diseases (which is true).
+
+## Tell me what diagnosis are related to Spinal Cord Injury by at least 5%
+
+```
+MATCH (a:diagnosis_category)-[r:RELATED]->(b:diagnosis_category)
+WHERE (a.category_id = 227 
+        OR b.category_id = 227) 
+      and r.mentions_probability >= 0.05 
+RETURN r
+
+```
+
+![related_sci](https://raw.githubusercontent.com/rmalarc/is607/master/project5/related_sci.png "Related to Spinal Cord Injury Graph")
