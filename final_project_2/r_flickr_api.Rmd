@@ -1,7 +1,7 @@
 ---
 title: 'Analyze Your Flickr Photostream Before You Buy a Lens'
 author: "Mauricio Alarcon"
-date: "April 21, 2015"
+date: "May 14, 2015"
 output: html_document
 ---
   
@@ -307,6 +307,53 @@ As we can see from the charts above, I tend to shoot my pictures on with a low f
 
 * * *
 
+##Let's do some statistical tests..
+
+### First one: Let's prove that hardly ever use zoom settings over 100mm
+
+* H0: My utilization of high-zoom (>100mm) values is random P(X>100)>0.95
+* H1: I consistently utilize high-zoom in my pictures P(X>100)<=0.95
+
+```{r}
+
+#Let's calculate the mean and standard deviation for my 17-270mm lens
+fl_17_2170 <- attr[attr$Lens=="18-270mm f/3.5-6.3" &!is.na(attr$FocalLength_clean),]
+
+
+
+mean_fl <- mean(fl_17_2170$FocalLength_clean) 
+sd_fl <- sd(fl_17_2170$FocalLength_clean) 
+
+pnorm(100,mean_fl,sd_fl)
+```
+
+With a p of 0.74, we must reject the null hypothesis and accept that I do utilize consistently zoom settings greater than 100mm
+
+### Since I do use high-level zoom settings, what's the cut-off with a p of 0.90?
+
+```{r}
+
+qnorm(0.95,mean_fl,sd_fl)
+
+```
+
+According tpo the value above, it makes sense to buy a lens with a zoom up to 173mm
+
+### Notes on the tests
+
+The above tests imply that zoom values follow a normal distribition, which as we look at the below histogram does not appear to be the case.
+
+```{r}
+
+
+histogram(~FocalLength_clean, data = fl_17_2170,
+          main="Distribution of Focal Length for 18-270mm f/3.5-6.3 lens",
+          xlab="Focal Length (mm)")
+
+```
+
+* * *
+
 ##Conclusion
 
-Based on my photographic history, there's no need to go for a big zoom lens. I should be fine if I choose a lens that goes up to 100mm. Instead, I should focus on a lens that offers the lowest f-number.
+Based on my photographic history, there's no need to go for a big zoom lens. Despite of the evidence, I should be fine if I choose a lens that goes up to 100mm. Instead, I should focus on a lens that offers the lowest f-number.
