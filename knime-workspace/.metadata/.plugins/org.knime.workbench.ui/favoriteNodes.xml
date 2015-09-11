@@ -17,20 +17,20 @@
 <favorite frequency="1" nodeid="org.knime.r.RToRNodeFactory"/>
 <favorite frequency="1" nodeid="org.knime.base.node.flowvariable.tablerowtovariable.TableToVariableNodeFactory"/>
 <favorite frequency="1" nodeid="org.knime.base.node.stats.testing.ttest.OneWayANOVANodeFactory"/>
-<favorite frequency="1" nodeid="org.knime.base.node.preproc.columnrenameregex.ColumnRenameRegexNodeFactory"/>
 <favorite frequency="1" nodeid="org.knime.optimization.internal.node.parameter.loopstart.LoopStartParOptNodeFactory"/>
+<favorite frequency="1" nodeid="org.knime.base.node.preproc.columnrenameregex.ColumnRenameRegexNodeFactory"/>
 <favorite frequency="1" nodeid="org.knime.r.ionodes.RPortObjectReaderNodeFactory"/>
 </frequents>
 <lastused>
-<favorite nodeid="org.knime.base.node.stats.testing.ttest.OneWayANOVANodeFactory"/>
-<favorite nodeid="org.knime.ext.jep.node"/>
-<favorite nodeid="org.knime.base.node.preproc.columnrenameregex.ColumnRenameRegexNodeFactory"/>
-<favorite nodeid="org.knime.base.node.preproc.rename.RenameNodeFactory"/>
-<favorite nodeid="org.knime.base.node.preproc.filter.column.DataColumnSpecFilterNodeFactory"/>
-<favorite nodeid="org.knime.r.ionodes.RPortObjectReaderNodeFactory"/>
-<favorite nodeid="org.knime.r.RReaderTableNodeFactory"/>
-<favorite nodeid="org.knime.r.RToTableNodeFactory"/>
-<favorite nodeid="org.knime.r.TableToRNodeFactory"/>
 <favorite nodeid="org.knime.r.RToRNodeFactory"/>
+<favorite nodeid="org.knime.r.TableToRNodeFactory"/>
+<favorite nodeid="org.knime.r.RToTableNodeFactory"/>
+<favorite nodeid="org.knime.r.RReaderTableNodeFactory"/>
+<favorite nodeid="org.knime.r.ionodes.RPortObjectReaderNodeFactory"/>
+<favorite nodeid="org.knime.base.node.preproc.filter.column.DataColumnSpecFilterNodeFactory"/>
+<favorite nodeid="org.knime.base.node.preproc.rename.RenameNodeFactory"/>
+<favorite nodeid="org.knime.base.node.preproc.columnrenameregex.ColumnRenameRegexNodeFactory"/>
+<favorite nodeid="org.knime.ext.jep.node"/>
+<favorite nodeid="org.knime.base.node.stats.testing.ttest.OneWayANOVANodeFactory"/>
 </lastused>
 </favoritenodes>

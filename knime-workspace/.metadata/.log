@@ -1025,3 +1025,13 @@ Command-line arguments:  -product org.knime.product.KNIME_PRODUCT
 
 !ENTRY org.eclipse.core.net 1 0 2015-03-18 13:30:47.816
 !MESSAGE System property http.nonProxyHosts has been set to local|*.local|169.254/16|*.169.254/16 by an external source. This value will be overwritten using the values from the preferences
+!SESSION 2015-05-26 18:03:12.419 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.7.0_60
+java.vendor=Oracle Corporation
+BootLoader constants: OS=macosx, ARCH=x86_64, WS=cocoa, NL=en_US
+Framework arguments:  -product org.knime.product.KNIME_PRODUCT
+Command-line arguments:  -product org.knime.product.KNIME_PRODUCT
+
+!ENTRY org.eclipse.core.net 1 0 2015-05-26 18:03:14.492
+!MESSAGE System property http.nonProxyHosts has been set to local|*.local|169.254/16|*.169.254/16 by an external source. This value will be overwritten using the values from the preferences

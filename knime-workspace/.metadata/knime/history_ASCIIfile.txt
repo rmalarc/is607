@@ -1,4 +1,4 @@
-file:/C:/Users/Adae/Documents/datengenerator/basicfilesdatagen/products.csv
 knime://knime.workflow/data.all
+file:/C:/Users/Adae/Documents/datengenerator/basicfilesdatagen/products.csv
 file:/C:/Users/Adae/Documents/datengenerator/baskets.csv
 knime://knime.workflow/iris.csv
